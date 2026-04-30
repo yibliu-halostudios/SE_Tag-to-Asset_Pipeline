@@ -334,20 +334,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
 <section id="scale-challenge">
   <h2>4. The Asset Scale Challenge</h2>
 
-  <h3>4.1 M1 Content Footprint</h3>
-  <table>
-    <tr><th>Content Area</th><th>M1 Asset Count</th><th>M1 Disk</th></tr>
-    <tr><td>Characters</td><td>~13,600</td><td>~11 GB</td></tr>
-    <tr><td>Vehicles</td><td>~3,700</td><td>~8 GB</td></tr>
-    <tr><td>Weapons</td><td>~1,600</td><td>~5 GB</td></tr>
-    <tr><td>Tags (BLAM total)</td><td><strong>~34,300</strong></td><td>~5 GB</td></tr>
-    <tr><td>Environments</td><td>~31,300</td><td>~40 GB</td></tr>
-    <tr><td>VFX</td><td>~10,000</td><td>~5%</td></tr>
-    <tr><td>Animations</td><td>~11,000 clips</td><td>—</td></tr>
-    <tr><td><strong>Total Package</strong></td><td>—</td><td><strong>86 GB</strong> (40% over target)</td></tr>
-  </table>
-
-  <h3>4.2 Historical Content Multipliers (Halo CE → 2 → 3)</h3>
+  <h3>4.1 Historical Content Multipliers (Halo CE → 2 → 3)</h3>
   <p>Using the original trilogy as a proxy for scope growth:</p>
   <table>
     <tr><th>Content Type</th><th>Halo: CE</th><th>Halo 2</th><th>Halo 3</th><th>CE→2 Growth</th></tr>
@@ -358,7 +345,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
     <tr><td>Multiplayer Maps</td><td>0 (campaign only)</td><td>12+ competitive</td><td>11+ competitive</td><td>N/A → 12+</td></tr>
   </table>
 
-  <h3>4.3 Projected M2/M3 New CVW Assets</h3>
+  <h3>4.2 Projected M2/M3 New CVW Assets</h3>
   <table>
     <tr><th>Category</th><th>M1</th><th>M2 Projected</th><th>New Types Needing UE Derivation</th></tr>
     <tr><td>Weapons</td><td>10 types (~1,600 assets)</td><td>~15 types (+ dual-wield)</td><td>~5 new weapon types</td></tr>
@@ -710,54 +697,54 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
   <!-- Visual Dependency Graph (SVG) -->
   <h3>Dependency Graph</h3>
   <div style="overflow-x:auto; margin:1.5rem 0;">
-    <svg width="720" height="310" viewBox="0 0 720 310" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+    <svg width="720" height="290" viewBox="0 0 720 290" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#58a6ff"/>
         </marker>
       </defs>
       <!-- R1 -> R2 -->
-      <line x1="200" y1="50" x2="308" y2="130" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <line x1="200" y1="110" x2="308" y2="110" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
       <!-- R1 -> R8 -->
-      <line x1="200" y1="50" x2="308" y2="200" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <line x1="200" y1="120" x2="308" y2="175" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
       <!-- R1 -> Batch -->
-      <line x1="200" y1="50" x2="308" y2="265" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowhead)"/>
+      <line x1="200" y1="130" x2="308" y2="240" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowhead)"/>
       <!-- R2 -> R5 -->
-      <line x1="440" y1="140" x2="528" y2="140" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <line x1="440" y1="110" x2="528" y2="110" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
 
-      <!-- R1 node -->
-      <rect x="50" y="25" width="150" height="50" rx="8" fill="rgba(63,185,80,0.15)" stroke="#3fb950" stroke-width="2.5"/>
-      <text x="125" y="47" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="700">R1: PYTHON TAG API</text>
-      <text x="125" y="63" text-anchor="middle" fill="#8b949e" font-size="9">Unlocks all automation</text>
+      <!-- R1 node (vertically centered) -->
+      <rect x="50" y="85" width="150" height="50" rx="8" fill="rgba(63,185,80,0.15)" stroke="#3fb950" stroke-width="2.5"/>
+      <text x="125" y="107" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="700">R1: PYTHON TAG API</text>
+      <text x="125" y="123" text-anchor="middle" fill="#8b949e" font-size="9">Unlocks all automation</text>
 
       <!-- R2 node -->
-      <rect x="310" y="115" width="130" height="50" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
-      <text x="375" y="137" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R2: Maya Auto-Fill</text>
-      <text x="375" y="153" text-anchor="middle" fill="#8b949e" font-size="9">Depends on R1</text>
+      <rect x="310" y="85" width="130" height="50" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="375" y="107" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R2: Maya Auto-Fill</text>
+      <text x="375" y="123" text-anchor="middle" fill="#8b949e" font-size="9">Depends on R1</text>
 
       <!-- R5 node -->
-      <rect x="530" y="115" width="155" height="50" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
-      <text x="607" y="137" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R5: Setup Wizard</text>
-      <text x="607" y="153" text-anchor="middle" fill="#8b949e" font-size="9">R1 + R2 &rarr; 1-day CVW setup</text>
+      <rect x="530" y="85" width="155" height="50" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="607" y="107" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R5: Setup Wizard</text>
+      <text x="607" y="123" text-anchor="middle" fill="#8b949e" font-size="9">R1 + R2 &rarr; 1-day CVW setup</text>
 
       <!-- R8 node -->
-      <rect x="310" y="183" width="130" height="45" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
-      <text x="375" y="205" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R8: Tag Rename</text>
-      <text x="375" y="219" text-anchor="middle" fill="#8b949e" font-size="9">Depends on R1</text>
+      <rect x="310" y="155" width="130" height="45" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="375" y="177" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R8: Tag Rename</text>
+      <text x="375" y="191" text-anchor="middle" fill="#8b949e" font-size="9">Depends on R1</text>
 
       <!-- Batch validation node (dashed) -->
-      <rect x="310" y="248" width="130" height="38" rx="8" fill="rgba(88,166,255,0.06)" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
-      <text x="375" y="271" text-anchor="middle" fill="#8b949e" font-size="9.5">Batch validation &amp; diffing</text>
+      <rect x="310" y="222" width="130" height="38" rx="8" fill="rgba(88,166,255,0.06)" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="375" y="245" text-anchor="middle" fill="#8b949e" font-size="9.5">Batch validation &amp; diffing</text>
 
       <!-- Independent items -->
-      <rect x="530" y="190" width="155" height="42" rx="8" fill="rgba(63,185,80,0.1)" stroke="#3fb950" stroke-width="1.5"/>
-      <text x="607" y="209" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="600">R3, R4, R7</text>
-      <text x="607" y="224" text-anchor="middle" fill="#8b949e" font-size="8.5">No deps &mdash; start anytime</text>
+      <rect x="530" y="155" width="155" height="42" rx="8" fill="rgba(63,185,80,0.1)" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="607" y="174" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="600">R3, R4, R7</text>
+      <text x="607" y="189" text-anchor="middle" fill="#8b949e" font-size="8.5">No deps &mdash; start anytime</text>
 
       <!-- Strategic items -->
-      <rect x="530" y="250" width="155" height="45" rx="8" fill="rgba(210,153,34,0.1)" stroke="#d29922" stroke-width="1.5" stroke-dasharray="5,3"/>
-      <text x="607" y="270" text-anchor="middle" fill="#d29922" font-size="10" font-weight="600">R6, R9, R10</text>
-      <text x="607" y="286" text-anchor="middle" fill="#8b949e" font-size="8.5">BLAM/Engine team collab</text>
+      <rect x="530" y="215" width="155" height="45" rx="8" fill="rgba(210,153,34,0.1)" stroke="#d29922" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="607" y="235" text-anchor="middle" fill="#d29922" font-size="10" font-weight="600">R6, R9, R10</text>
+      <text x="607" y="251" text-anchor="middle" fill="#8b949e" font-size="8.5">BLAM/Engine team collab</text>
     </svg>
   </div>
 
@@ -774,7 +761,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
 <section id="effort">
   <h2>9. Effort Estimates &amp; ROI</h2>
 
-  <h3>Investment Required &mdash; By Discipline</h3>
+  <h3>Investment Required &mdash; By Discipline (in Person-Months)</h3>
   <table>
     <thead>
       <tr><th>Recommendation</th><th>Engineers</th><th>Tech Artists</th><th>Artists</th><th>Total PM</th><th>Dependencies</th></tr>
