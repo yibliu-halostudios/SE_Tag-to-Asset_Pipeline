@@ -214,7 +214,7 @@
   <h3>2.2 The Model Tag Cluster</h3>
   <p><code>UBlamModelTagDataAsset</code> is the root of any CVW asset's tag hierarchy:</p>
   <div style="overflow-x:auto; margin:1.5rem 0;">
-    <svg width="680" height="230" viewBox="0 0 680 230" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 680 230" style="width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#58a6ff"/>
@@ -262,7 +262,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
 
   <h3>2.5 The Two Data Flow Directions</h3>
   <div style="overflow-x:auto; margin:1.5rem 0;">
-    <svg width="900" height="220" viewBox="0 0 900 220" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 900 220" style="width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
       <!-- Direction 1: Automatic -->
       <rect x="10" y="10" width="880" height="70" rx="8" fill="rgba(63,185,80,0.06)" stroke="#3fb950" stroke-width="1.5"/>
       <text x="30" y="35" fill="#3fb950" font-size="12" font-weight="700">Direction 1: BLAM → UE  (Tag Loading) — AUTOMATIC</text>
@@ -597,7 +597,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
   <div style="margin:1.5rem 0; overflow:hidden;">
     <div>
       <!-- Month headers -->
-      <div style="display:flex; margin-bottom:0.5rem; padding-left:200px;">
+      <div style="display:flex; margin-bottom:0.5rem; padding-left:160px;">
         <div style="flex:1; text-align:center; font-size:0.8rem; color:var(--text-muted); border-left:1px solid var(--border); font-weight:600;">Month 1</div>
         <div style="flex:1; text-align:center; font-size:0.8rem; color:var(--text-muted); border-left:1px solid var(--border); font-weight:600;">Month 2</div>
         <div style="flex:1; text-align:center; font-size:0.8rem; color:var(--text-muted); border-left:1px solid var(--border); font-weight:600;">Month 3</div>
@@ -607,12 +607,12 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       </div>
       <!-- Track labels -->
       <div style="display:flex; margin-bottom:0.4rem; padding-left:0;">
-        <div style="width:200px; flex-shrink:0; font-size:0.7rem; color:var(--tier1); font-weight:700; text-align:right; padding-right:1rem;">CRITICAL PATH</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.7rem; color:var(--tier1); font-weight:700; text-align:right; padding-right:1rem;">CRITICAL PATH</div>
         <div style="flex:1;"></div>
       </div>
       <!-- Critical path: R1 -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R1: Python Tag API</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R1: Python Tag API</div>
         <div style="flex:1; position:relative; height:26px;">
           <div style="position:absolute; left:0%; width:40%; height:26px; background:linear-gradient(90deg, var(--tier1), rgba(63,185,80,0.7)); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
             <span style="font-size:0.72rem; font-weight:600; color:#fff;">2 eng + 1 TA (prototype exists)</span>
@@ -621,7 +621,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       </div>
       <!-- Critical path: R2 -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R2: Maya Auto-Fill</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R2: Maya Auto-Fill</div>
         <div style="flex:1; position:relative; height:26px;">
           <div style="position:absolute; left:40%; width:20%; height:26px; background:var(--tier2); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
             <span style="font-size:0.72rem; font-weight:600; color:#fff;">2 TA</span>
@@ -630,7 +630,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       </div>
       <!-- Critical path: R5 (overlaps R2 tail) -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R5: Setup Wizard</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R5: Setup Wizard</div>
         <div style="flex:1; position:relative; height:26px;">
           <div style="position:absolute; left:50%; width:50%; height:26px; background:linear-gradient(90deg, var(--tier2), rgba(88,166,255,0.6)); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
             <span style="font-size:0.72rem; font-weight:600; color:#fff;">1 eng + 2 TA + artist UAT</span>
@@ -642,12 +642,12 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       </div>
       <!-- Separator -->
       <div style="display:flex; margin:0.6rem 0 0.4rem; padding-left:0;">
-        <div style="width:200px; flex-shrink:0; font-size:0.7rem; color:var(--accent); font-weight:700; text-align:right; padding-right:1rem;">PARALLEL TRACK A</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.7rem; color:var(--accent); font-weight:700; text-align:right; padding-right:1rem;">PARALLEL TRACK A</div>
         <div style="flex:1; border-top:1px solid var(--border);"></div>
       </div>
       <!-- Parallel: R3 -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R3: Crash Fix</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R3: Crash Fix</div>
         <div style="flex:1; position:relative; height:26px;">
           <div style="position:absolute; left:0%; width:15%; height:26px; background:var(--tier1); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
             <span style="font-size:0.72rem; font-weight:600; color:#fff;">1 eng</span>
@@ -656,7 +656,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       </div>
       <!-- Parallel: R4 -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R4: Auto-Export PIE</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R4: Auto-Export PIE</div>
         <div style="flex:1; position:relative; height:26px;">
           <div style="position:absolute; left:20%; width:30%; height:26px; background:var(--tier2); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
             <span style="font-size:0.72rem; font-weight:600; color:#fff;">1 eng</span>
@@ -665,7 +665,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       </div>
       <!-- Parallel: R8 -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R8: Tag Rename Tool</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R8: Tag Rename Tool</div>
         <div style="flex:1; position:relative; height:26px;">
           <div style="position:absolute; left:40%; width:20%; height:26px; background:var(--tier2); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
             <span style="font-size:0.72rem; font-weight:600; color:#fff;">1 TA</span>
@@ -674,12 +674,12 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       </div>
       <!-- Separator -->
       <div style="display:flex; margin:0.6rem 0 0.4rem; padding-left:0;">
-        <div style="width:200px; flex-shrink:0; font-size:0.7rem; color:var(--accent); font-weight:700; text-align:right; padding-right:1rem;">PARALLEL TRACK B</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.7rem; color:var(--accent); font-weight:700; text-align:right; padding-right:1rem;">PARALLEL TRACK B</div>
         <div style="flex:1; border-top:1px solid var(--border);"></div>
       </div>
       <!-- Parallel: R7 -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R7: Collision Preview</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R7: Collision Preview</div>
         <div style="flex:1; position:relative; height:26px;">
           <div style="position:absolute; left:0%; width:30%; height:26px; background:var(--tier1); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
             <span style="font-size:0.72rem; font-weight:600; color:#fff;">1 eng + 1 TA</span>
@@ -688,7 +688,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       </div>
       <!-- Parallel: R6/R9/R10 investigation -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R6/R9/R10: Investigation</div>
+        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R6/R9/R10: Investigation</div>
         <div style="flex:1; position:relative; height:26px;">
           <div style="position:absolute; left:40%; width:60%; height:26px; background:rgba(210,153,34,0.4); border-radius:4px; border:1px dashed var(--tier3); display:flex; align-items:center; padding:0 8px;">
             <span style="font-size:0.72rem; font-weight:600; color:#fff;">BLAM team &mdash; proposals only</span>
@@ -696,7 +696,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
         </div>
       </div>
       <!-- Gate markers -->
-      <div style="display:flex; margin-top:0.8rem; padding-left:200px;">
+      <div style="display:flex; margin-top:0.8rem; padding-left:160px;">
         <div style="flex:2; text-align:right; padding-right:8px;">
           <span style="font-size:0.75rem; color:var(--tier1);">&#9670; Gate 1: R1 ships (month 2)</span>
         </div>
@@ -722,7 +722,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
 <!-- Visual Dependency Graph (SVG) -->
   <h3>Dependency Graph</h3>
   <div style="overflow-x:auto; margin:1.5rem 0;">
-    <svg width="720" height="290" viewBox="0 0 720 290" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 720 290" style="width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#58a6ff"/>
