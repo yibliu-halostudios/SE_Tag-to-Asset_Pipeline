@@ -138,7 +138,7 @@
 <body>
 
 <div class="hero">
-  <h1>Tag-to-Asset Pipeline <span style="font-size:0.5em; opacity:0.5; font-weight:400; vertical-align:middle;">April 2026 · Rev 2</span></h1>
+  <h1>Tag-to-Asset Pipeline <span style="font-size:0.5em; opacity:0.5; font-weight:400; vertical-align:middle;">April 2026 · Rev 3</span></h1>
   <p class="subtitle">Analysis & Recommendations — 5-Month Accelerated Plan (6-Month Contingency)</p>
   <div class="attribution">
     Prepared by Yibo Liu &nbsp;|&nbsp; AI-assisted research &amp; drafting: Claude Opus 4.6<br>
@@ -423,7 +423,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
 <section id="recommendations">
   <h2>7. Recommendations</h2>
 
-  <p>Ten recommendations organized into three tiers aligned with the TA Strategy Roadmap themes:</p>
+  <p>Ten primary recommendations plus three additional items identified through cross-validation, organized into three tiers aligned with the TA Strategy Roadmap themes:</p>
   <ul>
     <li><strong>Theme 1 — Scale Through Productivity:</strong> Increase throughput without growing team</li>
     <li><strong>Theme 2 — Minimize BLAM Surface Area:</strong> Reduce UE↔BLAM coupling where possible</li>
@@ -443,7 +443,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
     <tr><td>Solves</td><td>P0, P2, P8 (and enables R2, R5, R8)</td></tr>
     <tr><td>Effort</td><td>2–3 person-months</td></tr>
     <tr><td>Impact</td><td><strong>Critical</strong> — prerequisite for all automation</td></tr>
-    <tr><td>Risk</td><td class="risk-low">Low — prototype exists</td></tr>
+    <tr><td>Risk</td><td class="risk-medium">Medium — prototype exists but must generalize across 158 tag types with arrays/refs/enums</td></tr>
     <tr><td>AI-Agent Opportunity</td><td>HIGH — structured data transformations are ideal for coding agents</td></tr>
   </table>
 
@@ -500,7 +500,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
   <p><span class="tier-badge t2">Medium-Term</span> Depends on R1 + R2</p>
 
   <div class="callout">
-    <strong>Target outcome:</strong> Reduce initial CVW asset setup from 1–3 weeks to <strong>less than one day</strong> for standard asset archetypes.
+    <strong>Target outcome:</strong> Reduce initial CVW asset <em>authoring setup</em> from 1–3 weeks to <strong>less than one day</strong> for standard asset archetypes. (Note: downstream validation/testing remains a separate effort.)
   </div>
 
   <table>
@@ -583,6 +583,52 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
     <tr><td>Risk</td><td class="risk-high">High — deeply coupled to BLAM runtime expectations</td></tr>
   </table>
   <p>Investigate whether a single source mesh with automated derivation (LOD/collision/fallback) can replace the current many-mesh-per-asset pattern. Explore during R9 collision redesign work.</p>
+
+  <!-- Cross-Validation Additions (GPT 5.4) -->
+  <h3 style="margin-top:2.5rem; padding-top:1.5rem; border-top:1px solid var(--border);">Cross-Validation Additions</h3>
+  <p style="font-size:0.9rem; color:var(--text-muted);">The following items were identified through independent GPT 5.4 cross-validation of Jira (ST-9443, ST-9548), Confluence workflows, and Perforce source analysis.</p>
+
+  <!-- R11 -->
+  <h3>R11: Shared-Tag Dependency Audit &amp; Clone-on-Derive Tool</h3>
+  <p><span class="tier-badge t2">Medium-Term</span></p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>Hidden coupling — child tags (collision, physics) shared across assets require manual spin-off before derivation</td></tr>
+    <tr><td>Effort</td><td>1–2 person-months</td></tr>
+    <tr><td>Impact</td><td>Medium-High — prevents silent breakage when deriving shared assets</td></tr>
+    <tr><td>Risk</td><td class="risk-medium">Medium — must detect sharing without false positives</td></tr>
+    <tr><td>Source</td><td>Confluence: "UE Derivation Testing" (civilian_male uses marine collision tags)</td></tr>
+  </table>
+  <p>Detect shared child-tag dependencies before derivation and offer automatic clone-and-reassign. Prevents unintentional edits propagating to unrelated assets.</p>
+
+  <!-- R12 -->
+  <h3>R12: Marker/Reimport-Order Validator</h3>
+  <p><span class="tier-badge t2">Medium-Term</span></p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>Marker loss on skeleton reimport; specific import ordering required; 10–30 min force reimports (ST-9443)</td></tr>
+    <tr><td>Effort</td><td>0.5–1 person-month</td></tr>
+    <tr><td>Impact</td><td>Medium — prevents subtle data loss during routine reimports</td></tr>
+    <tr><td>Risk</td><td class="risk-low">Low — validation/advisory tooling, non-destructive</td></tr>
+    <tr><td>Source</td><td>Jira ST-9443; Confluence: "Stage One Asset Updating"</td></tr>
+  </table>
+  <p>Warn when import order may cause marker loss. Validate marker integrity post-import. Provide one-click recovery path when markers are dropped.</p>
+
+  <!-- R13 -->
+  <h3>R13: Tag Diff/Search/Diagnostic Tooling</h3>
+  <p><span class="tier-badge t1">Short-Term</span> Depends on R1</p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>No meaningful diff between tag versions; no search within tag field blocks (ST-9548)</td></tr>
+    <tr><td>Effort</td><td>1–2 person-months (once R1 ships)</td></tr>
+    <tr><td>Impact</td><td>High — enables change tracking, debugging, and review workflows</td></tr>
+    <tr><td>Risk</td><td class="risk-low">Low — read-only tooling built on R1 API</td></tr>
+    <tr><td>Source</td><td>Jira ST-9548 (explicitly requested by TAs)</td></tr>
+  </table>
+  <p>Field-level diff between tag versions. Search across tag fields by value. Diagnostic mode showing wiring completeness and missing references.</p>
 </section>
 
 <!-- 8. Roadmap -->
@@ -835,10 +881,10 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
 
   <div class="effort-highlight">
     <h4>Return on Investment &mdash; M2 Alone</h4>
-    <p><span class="number">45&ndash;55 person-weeks saved</span></p>
-    <p>At 13&ndash;16 new CVW asset types &times; current 1&ndash;3 week rate = 13&ndash;48 person-weeks of setup. Post-tooling cost: &lt;2 person-weeks total. Net savings: 11&ndash;46 person-weeks (conservative: 45&ndash;55 PW including iteration improvements).</p>
-    <p style="margin-top: 0.5rem;"><strong>Investment: 9&ndash;16 PM (~39&ndash;70 PW) &rarr; Savings: 45&ndash;55 PW in M2 + compounds in M3</strong></p>
-    <p style="font-size: 0.9rem; color: var(--text-muted);">Net positive by end of M2. Further compounds in M3 (additional 6&ndash;9K new character assets, 12+ types, more equipment).</p>
+    <p><span class="number">13&ndash;48 person-weeks saved (setup only)</span></p>
+    <p>At 13&ndash;16 new CVW asset types &times; current 1&ndash;3 week rate = 13&ndash;48 person-weeks of setup. Post-tooling cost: &lt;2 person-weeks total. Additional iteration-speed savings across the team compound this further.</p>
+    <p style="margin-top: 0.5rem;"><strong>Investment: 9&ndash;16 PM (~39&ndash;70 PW) &rarr; Direct setup savings: 13&ndash;48 PW in M2, compounds significantly in M3</strong></p>
+    <p style="font-size: 0.9rem; color: var(--text-muted);">Breakeven likely by mid-M2 when including iteration speed, error reduction, and innovation enablement. Further compounds in M3 (additional 6&ndash;9K new character assets, 12+ types, more equipment).</p>
   </div>
 
   <p style="font-size:0.9rem; color:var(--text-muted); margin-top:1.5rem;"><strong>Beyond direct time savings:</strong> automation also unlocks innovation (features previously cut due to setup cost), outsource enablement, error reduction via validation, knowledge democratization, and AI-agent acceleration.</p>
@@ -895,6 +941,9 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
     <li><strong>Blocking M2 production for pipeline perfection</strong> — Short-term wins (R1, R3, R7) deliver value in weeks. Production can start in parallel.</li>
     <li><strong>Over-investing in collision redesign without proof</strong> — R9 starts as investigation. Commit only when quick wins (R7 preview) prove the approach.</li>
   </ul>
+
+  <h3 style="margin-top:2.5rem; padding-top:1.5rem; border-top:1px solid var(--border);">Cross-Validation Methodology</h3>
+  <p style="font-size:0.9rem; color:var(--text-muted);">This study was independently cross-validated by GPT 5.4 with full access to Jira, Confluence, and Perforce source code. Key outcomes: core architecture analysis confirmed; R1 risk elevated from Low to Medium; ROI figures tightened; three new recommendations added (R11–R13) based on workflow issues found in ST-9443, ST-9548, and Confluence derivation documentation. Timeline assessed as achievable for primary tranche (R1, R3, R4, R7) within 5 months.</p>
 </section>
 
 </div><!-- end container -->
