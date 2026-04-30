@@ -167,13 +167,7 @@
     <strong>Critical Finding:</strong> Every new CVW asset (character, vehicle, or weapon) requires 1–3 weeks of Technical Art time for "UE Derivation" — the manual process of wiring UE content into BLAM tag structures. At M2/M3 scale (3–4× content volume), this represents <strong>6–12 person-months</strong> of pure setup work per milestone, creating an unacceptable bottleneck.
   </div>
 
-  <p>The Tag-to-Asset Pipeline is the end-to-end data flow connecting Unreal Engine content to the BLAM runtime in Project Meteorite's stitched engine. It encompasses two directions:</p>
-  <ul>
-    <li><strong>Upstream (Blam Tags):</strong> Authoring and editing BLAM tag DataAssets within UE — repetitive, requires specialized knowledge, lacks automation</li>
-    <li><strong>Downstream (UE Derivation):</strong> Converting UE-authored content (meshes, animations, physics) into BLAM binary format — manual, error-prone, 1–3 weeks per new asset</li>
-  </ul>
-
-  <div class="callout success">
+    <div class="callout success">
     <strong>Primary Recommendation:</strong> Invest in a <strong>Python Tag Field Read/Write API</strong> (R1). A working prototype already exists. This single capability unlocks automation of the entire UE Derivation setup process, reducing new asset creation from weeks to under one day. Estimated ROI: 7–12 person-months invested → 45–55 person-weeks saved in M2 alone.
   </div>
 
@@ -211,22 +205,38 @@
   </table>
 
   <h3>2.2 The Model Tag Cluster</h3>
-  <p><code>UBlamModelTagDataAsset</code> is the root of any CVW asset's tag hierarchy. It references:</p>
-  <div class="diagram">
-<pre>
-    ┌─────────────────────────────────┐
-    │   UBlamModelTagDataAsset        │
-    │   (.model)                      │
-    ├─────────────────────────────────┤
-    │ → SkeletonModel (.skeleton)     │──→ UBlamSkeletonModelTagDataAsset
-    │ → CollisionModel (.collision)   │──→ UBlamCollisionModelTagDataAsset
-    │ → PhysicsModel (.physics)       │──→ UBlamPhysicsModelTagDataAsset
-    │ → AnimGraph (.model_anim_graph) │──→ UBlamModelAnimationGraphTagDataAsset
-    │ → RegionStringTable             │──→ Regions, Permutations, Materials
-    └─────────────────────────────────┘
-</pre>
+  <p><code>UBlamModelTagDataAsset</code> is the root of any CVW asset's tag hierarchy:</p>
+  <div style="overflow-x:auto; margin:1.5rem 0;">
+    <svg width="680" height="230" viewBox="0 0 680 230" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#58a6ff"/>
+        </marker>
+      </defs>
+      <!-- Central node -->
+      <rect x="20" y="80" width="220" height="60" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="2"/>
+      <text x="130" y="105" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="700">UBlamModelTagDataAsset</text>
+      <text x="130" y="122" text-anchor="middle" fill="#8b949e" font-size="9">(.model) — master tag</text>
+      <!-- Arrows -->
+      <line x1="240" y1="90" x2="340" y2="30" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="240" y1="100" x2="340" y2="75" stroke="#f85149" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="240" y1="110" x2="340" y2="120" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="240" y1="120" x2="340" y2="165" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="240" y1="130" x2="340" y2="210" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Sub-tag nodes -->
+      <rect x="345" y="15" width="310" height="30" rx="5" fill="rgba(63,185,80,0.08)" stroke="#3fb950" stroke-width="1"/>
+      <text x="500" y="34" text-anchor="middle" fill="#e6edf3" font-size="9.5"><tspan fill="#3fb950" font-weight="600">SkeletonModel</tspan>  .skeleton_model</text>
+      <rect x="345" y="60" width="310" height="30" rx="5" fill="rgba(248,81,73,0.08)" stroke="#f85149" stroke-width="1"/>
+      <text x="500" y="79" text-anchor="middle" fill="#e6edf3" font-size="9.5"><tspan fill="#f85149" font-weight="600">CollisionModel</tspan>  .collision_model (key pain point)</text>
+      <rect x="345" y="105" width="310" height="30" rx="5" fill="rgba(210,153,34,0.08)" stroke="#d29922" stroke-width="1"/>
+      <text x="500" y="124" text-anchor="middle" fill="#e6edf3" font-size="9.5"><tspan fill="#d29922" font-weight="600">PhysicsModel</tspan>  .physics_model</text>
+      <rect x="345" y="150" width="310" height="30" rx="5" fill="rgba(139,92,246,0.08)" stroke="#8b5cf6" stroke-width="1"/>
+      <text x="500" y="169" text-anchor="middle" fill="#e6edf3" font-size="9.5"><tspan fill="#8b5cf6" font-weight="600">AnimGraph</tspan>  .model_animation_graph</text>
+      <rect x="345" y="195" width="310" height="30" rx="5" fill="rgba(88,166,255,0.05)" stroke="#30363d" stroke-width="1"/>
+      <text x="500" y="214" text-anchor="middle" fill="#8b949e" font-size="9.5">RegionStringTable (Regions, Perms, Materials)</text>
+    </svg>
   </div>
-  <p>Each sub-tag must be manually created, named to match the BLAM path exactly, and wired back to the parent model tag.</p>
+<p>Each sub-tag must be manually created, named to match the BLAM path exactly, and wired back to the parent model tag.</p>
 
   <h3>2.3 Tag-to-Asset Manager (Runtime Resolution)</h3>
   <p><code>FBlamTagToAssetManager</code> maps BLAM tag indices to UE DataAssets at runtime. It enforces a <strong>strict 1:1 naming convention</strong>:</p>
@@ -244,20 +254,49 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
   </ul>
 
   <h3>2.5 The Two Data Flow Directions</h3>
-  <div class="diagram">
-<pre>
-Direction 1: BLAM → UE ("Tag Loading") — AUTOMATIC
-═══════════════════════════════════════════════════
-  Legacy Reach Binary Tag → BlamTagIoHandler → UBlamTagDataAssetBase → Runtime
+  <div style="overflow-x:auto; margin:1.5rem 0;">
+    <svg width="720" height="180" viewBox="0 0 720 180" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+      <!-- Direction 1: Automatic -->
+      <rect x="10" y="10" width="700" height="60" rx="8" fill="rgba(63,185,80,0.06)" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="30" y="32" fill="#3fb950" font-size="10" font-weight="700">Direction 1: BLAM → UE  (Tag Loading) — AUTOMATIC</text>
+      <rect x="30" y="42" width="120" height="22" rx="4" fill="rgba(63,185,80,0.12)" stroke="#3fb950" stroke-width="1"/>
+      <text x="90" y="57" text-anchor="middle" fill="#e6edf3" font-size="8.5">Reach Binary Tag</text>
+      <text x="165" y="57" fill="#8b949e" font-size="10">→</text>
+      <rect x="180" y="42" width="120" height="22" rx="4" fill="rgba(63,185,80,0.12)" stroke="#3fb950" stroke-width="1"/>
+      <text x="240" y="57" text-anchor="middle" fill="#e6edf3" font-size="8.5">BlamTagIoHandler</text>
+      <text x="315" y="57" fill="#8b949e" font-size="10">→</text>
+      <rect x="330" y="42" width="150" height="22" rx="4" fill="rgba(63,185,80,0.12)" stroke="#3fb950" stroke-width="1"/>
+      <text x="405" y="57" text-anchor="middle" fill="#e6edf3" font-size="8.5">UBlamTagDataAssetBase</text>
+      <text x="495" y="57" fill="#8b949e" font-size="10">→</text>
+      <rect x="510" y="42" width="80" height="22" rx="4" fill="rgba(63,185,80,0.12)" stroke="#3fb950" stroke-width="1"/>
+      <text x="550" y="57" text-anchor="middle" fill="#e6edf3" font-size="8.5">Runtime</text>
 
-Direction 2: UE → BLAM ("UE Derivation") — MANUAL
-═══════════════════════════════════════════════════
-  UE Content → Sidecar XML → FBX Export → Foundation Tool → BLAM Binary → Reload
-  ▲                                                                          │
-  └──────────── 1–3 WEEKS of manual setup per new asset ─────────────────────┘
-</pre>
+      <!-- Direction 2: Manual -->
+      <rect x="10" y="90" width="700" height="80" rx="8" fill="rgba(248,81,73,0.04)" stroke="#f85149" stroke-width="1.5"/>
+      <text x="30" y="112" fill="#f85149" font-size="10" font-weight="700">Direction 2: UE → BLAM  (UE Derivation) — MANUAL, 1–3 WEEKS</text>
+      <rect x="30" y="122" width="90" height="22" rx="4" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="1"/>
+      <text x="75" y="137" text-anchor="middle" fill="#e6edf3" font-size="8.5">UE Content</text>
+      <text x="132" y="137" fill="#8b949e" font-size="10">→</text>
+      <rect x="145" y="122" width="90" height="22" rx="4" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="1"/>
+      <text x="190" y="137" text-anchor="middle" fill="#e6edf3" font-size="8.5">Sidecar XML</text>
+      <text x="247" y="137" fill="#8b949e" font-size="10">→</text>
+      <rect x="260" y="122" width="80" height="22" rx="4" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="1"/>
+      <text x="300" y="137" text-anchor="middle" fill="#e6edf3" font-size="8.5">FBX Export</text>
+      <text x="352" y="137" fill="#8b949e" font-size="10">→</text>
+      <rect x="365" y="122" width="90" height="22" rx="4" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="1"/>
+      <text x="410" y="137" text-anchor="middle" fill="#e6edf3" font-size="8.5">Foundation</text>
+      <text x="467" y="137" fill="#8b949e" font-size="10">→</text>
+      <rect x="480" y="122" width="100" height="22" rx="4" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="1"/>
+      <text x="530" y="137" text-anchor="middle" fill="#e6edf3" font-size="8.5">BLAM Binary</text>
+      <text x="592" y="137" fill="#8b949e" font-size="10">→</text>
+      <rect x="605" y="122" width="80" height="22" rx="4" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="1"/>
+      <text x="645" y="137" text-anchor="middle" fill="#e6edf3" font-size="8.5">Reload</text>
+      <text x="360" y="160" text-anchor="middle" fill="#f85149" font-size="8.5" font-style="italic">↑ This is where all the manual pain lives — R1 through R5 target this flow</text>
+    </svg>
   </div>
 </section>
+
+
 
 <!-- 3. The Core Problem -->
 <section id="core-problem">
@@ -271,14 +310,6 @@ Direction 2: UE → BLAM ("UE Derivation") — MANUAL
     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">— Senior TA, ST-9548</p>
   </div>
 
-  <p>Specifically, for each collision model the artist must manually set:</p>
-  <ul>
-    <li><strong>Region</strong> — which region of the model this collision mesh belongs to</li>
-    <li><strong>Material</strong> — the collision material assignment</li>
-    <li><strong>Permutation</strong> — which permutation (variant) this applies to</li>
-    <li><strong>Bone</strong> — which skeleton bone this collision mesh is bound to</li>
-    <li><strong>CollisionMesh</strong> — reference to the UE StaticMesh asset</li>
-  </ul>
   <p>All of this data <em>already exists in the Maya scene hierarchy</em> — joints define bones, naming defines regions/permutations, and meshes are already parented. But there is no bridge to propagate it into BLAM tags.</p>
 
   <h3>Why Automation Doesn't Exist Today</h3>
@@ -337,21 +368,8 @@ Direction 2: UE → BLAM ("UE Derivation") — MANUAL
     <tr><td>MP Maps</td><td>0</td><td>12+ competitive maps</td><td>Each needs full collision/nav</td></tr>
   </table>
 
-  <div class="effort-highlight">
-    <h4>Cost at Current Rate</h4>
-    <p><span class="number">6–12 person-months</span></p>
-    <p>Conservative estimate for M2 UE Derivation setup work alone (13–16 new CVW types × 1–3 weeks each). This does not include iteration time, bug fixing, or the crash/workaround overhead.</p>
-  </div>
+  </section>
 
-  <h3>4.4 What Breaks at Scale</h3>
-  <ol>
-    <li><strong>TA Bottleneck:</strong> Only Technical Artists can do UE Derivation (requires specialized BLAM knowledge). Team size is fixed.</li>
-    <li><strong>Innovation Tax:</strong> Every new feature on an asset multiplies setup cost → features get cut.</li>
-    <li><strong>Error Compounding:</strong> Manual wiring × more assets = more bugs. Each collision mis-wire takes hours to diagnose.</li>
-    <li><strong>No Outsource Path:</strong> Cannot outsource UE Derivation (no documentation, requires deep BLAM knowledge).</li>
-    <li><strong>Collision Pipeline:</strong> Each MP map needs full collision/navmesh work at 3–5 min per export with frequent crashes.</li>
-  </ol>
-</section>
 
 <!-- 5. Pain Points -->
 <section id="pain-points">
@@ -593,13 +611,7 @@ Direction 2: UE → BLAM ("UE Derivation") — MANUAL
         <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 8</div>
         <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 9</div>
       </div>
-      <!-- Phase labels -->
-      <div style="display:flex; margin-bottom:0.8rem; padding-left:200px; font-size:0.7rem; font-weight:600;">
-        <div style="flex:3; text-align:center; color:var(--tier1); background:rgba(63,185,80,0.06); border-radius:4px; padding:0.2rem 0;">SHORT-TERM (Pre-Production)</div>
-        <div style="flex:3; text-align:center; color:var(--tier2); background:rgba(88,166,255,0.06); border-radius:4px; padding:0.2rem 0; margin-left:2px;">MEDIUM-TERM (Early Production)</div>
-        <div style="flex:3; text-align:center; color:var(--tier3); background:rgba(210,153,34,0.06); border-radius:4px; padding:0.2rem 0; margin-left:2px;">STRATEGIC (Mid-Production &rarr; M3)</div>
-      </div>
-      <!-- Gantt rows -->
+            <!-- Gantt rows -->
       <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
         <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R1: Python Tag API</div>
         <div style="flex:1; position:relative; height:26px;">
@@ -817,16 +829,9 @@ Direction 2: UE → BLAM ("UE Derivation") — MANUAL
     <p style="font-size: 0.9rem; color: var(--text-muted);">Net positive by end of M2. Further compounds in M3 (additional 6&ndash;9K new character assets, 12+ types, more equipment).</p>
   </div>
 
-  <h3>Beyond the Numbers</h3>
-  <p>The ROI calculation above only captures direct setup time. It does <em>not</em> include:</p>
-  <ul>
-    <li><strong>Innovation unlocked</strong> &mdash; features previously cut due to setup cost become viable</li>
-    <li><strong>Outsource enablement</strong> &mdash; documented, automated pipeline can be taught to external partners</li>
-    <li><strong>Error reduction</strong> &mdash; automated validation catches wiring bugs before they reach QA</li>
-    <li><strong>Knowledge democratization</strong> &mdash; fewer &ldquo;only 2 people know how to do this&rdquo; bottlenecks</li>
-    <li><strong>AI-agent acceleration</strong> &mdash; Python API makes the pipeline ideal for LLM-assisted authoring</li>
-  </ul>
+  <p style="font-size:0.9rem; color:var(--text-muted); margin-top:1.5rem;"><strong>Beyond direct time savings:</strong> automation also unlocks innovation (features previously cut due to setup cost), outsource enablement, error reduction via validation, knowledge democratization, and AI-agent acceleration.</p>
 </section>
+
 <!-- 10. Risks -->
 <section id="risks">
   <h2>10. Risks & Mitigations</h2>
