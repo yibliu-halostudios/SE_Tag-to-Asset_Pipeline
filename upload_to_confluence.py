@@ -119,7 +119,7 @@ def upload(post_url, hdrs, result_queue, html, page_id, title, cloud_id):
         "content": [{
             "type": "extension",
             "attrs": {
-                "layout": "default",
+                "layout": "full-width",
                 "extensionType": "com.atlassian.confluence.macro.core",
                 "extensionKey": "macro-html",
                 "parameters": {
