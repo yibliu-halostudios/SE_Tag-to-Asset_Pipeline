@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -135,8 +135,8 @@
 <body>
 
 <header class="hero">
-  <h1>Tag-to-Asset Pipeline</h1>
-  <p class="subtitle">Analysis & Recommendations — Project Meteorite</p>
+  <h1>Tag-to-Asset Pipeline <span style="font-size:0.5em; opacity:0.5; font-weight:400; vertical-align:middle;">April 2026 · Rev 1</span></h1>
+  <p class="subtitle">Analysis & Recommendations — 6-9 Months Plan</p>
   <p class="attribution">Prepared by Yibo Liu &nbsp;|&nbsp; AI-assisted research & drafting: Claude Opus 4.6</p>
 </header>
 
@@ -577,111 +577,256 @@ Direction 2: UE → BLAM ("UE Derivation") — MANUAL
 <section id="roadmap">
   <h2>8. Implementation Roadmap</h2>
 
-  <div class="diagram">
-<pre>
-SHORT-TERM (M2 Pre-Production, Months 1–3)
-═══════════════════════════════════════════
-  ┌──────────────────────────────────────────────────┐
-  │  R1: Python Tag Field API  ◄── UNLOCKS ALL ELSE  │
-  │  R3: Fix Collision Export Crash (quick win)       │
-  │  R7: Collision Preview in UE (partial)            │
-  └──────────────────────────────────────────────────┘
-  Outcome: Remove worst crash, enable automation prototyping,
-           instant collision feedback for artists
-
-MEDIUM-TERM (M2 Early Production, Months 4–6)
-═════════════════════════════════════════════
-  ┌──────────────────────────────────────────────────┐
-  │  R2: Maya→Tag Auto-Fill (depends on R1)           │
-  │  R4: Auto-Export Before PIE                       │
-  │  R5: UE Derivation Setup Wizard (R1 + R2)        │
-  │  R8: Tag Rename Tool (depends on R1)              │
-  └──────────────────────────────────────────────────┘
-  Outcome: New CVW asset setup drops from 1–3 weeks to &lt; 1 day
-           Iteration cycle improves across the board
-
-STRATEGIC (M2 Mid-Production → M3, Months 7–12+)
-═════════════════════════════════════════════════
-  ┌──────────────────────────────────────────────────┐
-  │  R6: Incremental Structure Generation (BLAM team) │
-  │  R9: Collision Pipeline Redesign (investigation)  │
-  │  R10: Reduce Mesh Separation (investigation)      │
-  └──────────────────────────────────────────────────┘
-  Outcome: Fundamental architecture improvements for M3+
-           Prepare pipeline for next-gen evolution
-</pre>
+  <!-- Visual Gantt Timeline -->
+  <h3>Timeline</h3>
+  <div style="overflow-x:auto; margin:1.5rem 0;">
+    <div style="min-width:800px;">
+      <!-- Month headers -->
+      <div style="display:flex; margin-bottom:0.3rem; padding-left:200px;">
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 1</div>
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 2</div>
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 3</div>
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 4</div>
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 5</div>
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 6</div>
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 7</div>
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 8</div>
+        <div style="flex:1; text-align:center; font-size:0.75rem; color:var(--text-muted); border-left:1px solid var(--border);">Month 9</div>
+      </div>
+      <!-- Phase labels -->
+      <div style="display:flex; margin-bottom:0.8rem; padding-left:200px; font-size:0.7rem; font-weight:600;">
+        <div style="flex:3; text-align:center; color:var(--tier1); background:rgba(63,185,80,0.06); border-radius:4px; padding:0.2rem 0;">SHORT-TERM (Pre-Production)</div>
+        <div style="flex:3; text-align:center; color:var(--tier2); background:rgba(88,166,255,0.06); border-radius:4px; padding:0.2rem 0; margin-left:2px;">MEDIUM-TERM (Early Production)</div>
+        <div style="flex:3; text-align:center; color:var(--tier3); background:rgba(210,153,34,0.06); border-radius:4px; padding:0.2rem 0; margin-left:2px;">STRATEGIC (Mid-Production &rarr; M3)</div>
+      </div>
+      <!-- Gantt rows -->
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R1: Python Tag API</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:0%; width:33.3%; height:26px; background:linear-gradient(90deg, var(--tier1), rgba(63,185,80,0.7)); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">&#9654; CRITICAL PATH &mdash; unlocks all</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R3: Crash Fix</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:0%; width:11.1%; height:26px; background:var(--tier1); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">Quick win</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R7: Collision Preview</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:11.1%; width:22.2%; height:26px; background:var(--tier1); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">UE viewport feedback</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R2: Maya Auto-Fill</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:33.3%; width:22.2%; height:26px; background:var(--tier2); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">After R1 ships</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R4: Auto-Export PIE</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:33.3%; width:22.2%; height:26px; background:var(--tier2); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">Independent</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R5: Setup Wizard</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:44.4%; width:22.2%; height:26px; background:linear-gradient(90deg, var(--tier2), rgba(88,166,255,0.7)); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">R1+R2 &rarr; wizard</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R8: Tag Rename Tool</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:33.3%; width:16.7%; height:26px; background:var(--tier2); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">After R1</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R6: Incr. Structure Gen</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:66.7%; width:33.3%; height:26px; background:var(--tier3); border-radius:4px; display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">BLAM team collab</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R9: Collision Redesign</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:66.7%; width:33.3%; height:26px; background:rgba(210,153,34,0.5); border-radius:4px; border:1px dashed var(--tier3); display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">Investigation</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
+        <div style="width:200px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R10: Mesh Separation</div>
+        <div style="flex:1; position:relative; height:26px;">
+          <div style="position:absolute; left:77.8%; width:22.2%; height:26px; background:rgba(210,153,34,0.5); border-radius:4px; border:1px dashed var(--tier3); display:flex; align-items:center; padding:0 8px;">
+            <span style="font-size:0.72rem; font-weight:600; color:#fff;">Investigation</span>
+          </div>
+        </div>
+      </div>
+      <!-- Gate markers -->
+      <div style="display:flex; margin-top:0.8rem; padding-left:200px;">
+        <div style="flex:3; text-align:right; padding-right:4px;">
+          <span style="font-size:0.75rem; color:var(--tier1);">&#9670; Gate 1: R1 ships</span>
+        </div>
+        <div style="flex:3; text-align:right; padding-right:4px;">
+          <span style="font-size:0.75rem; color:var(--tier2);">&#9670; Gate 2: R5 ships, 1-day CVW setup</span>
+        </div>
+        <div style="flex:3; text-align:right; padding-right:4px;">
+          <span style="font-size:0.75rem; color:var(--tier3);">&#9670; Gate 3: M3 readiness review</span>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Visual Dependency Graph (SVG) -->
   <h3>Dependency Graph</h3>
-  <div class="diagram">
-<pre>
-  R1 (Python API) ─────┬──→ R2 (Maya Auto-Fill) ──→ R5 (Setup Wizard)
-                        ├──→ R8 (Rename Tool)
-                        └──→ Batch validation, tag diffing
+  <div style="overflow-x:auto; margin:1.5rem 0;">
+    <svg width="720" height="310" viewBox="0 0 720 310" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#58a6ff"/>
+        </marker>
+      </defs>
+      <!-- R1 -> R2 -->
+      <line x1="200" y1="50" x2="308" y2="130" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <!-- R1 -> R8 -->
+      <line x1="200" y1="50" x2="308" y2="200" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <!-- R1 -> Batch -->
+      <line x1="200" y1="50" x2="308" y2="265" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowhead)"/>
+      <!-- R2 -> R5 -->
+      <line x1="440" y1="140" x2="528" y2="140" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrowhead)"/>
 
-  R3 (Crash Fix) ──→ Independent (no dependencies)
-  R4 (Auto-Export) ──→ Independent (no dependencies)
-  R7 (Collision Preview) ──→ Independent (no dependencies)
+      <!-- R1 node -->
+      <rect x="50" y="25" width="150" height="50" rx="8" fill="rgba(63,185,80,0.15)" stroke="#3fb950" stroke-width="2.5"/>
+      <text x="125" y="47" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="700">R1: PYTHON TAG API</text>
+      <text x="125" y="63" text-anchor="middle" fill="#8b949e" font-size="9">Unlocks all automation</text>
 
-  R6, R9, R10 ──→ Require BLAM/Engine team collaboration
-</pre>
+      <!-- R2 node -->
+      <rect x="310" y="115" width="130" height="50" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="375" y="137" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R2: Maya Auto-Fill</text>
+      <text x="375" y="153" text-anchor="middle" fill="#8b949e" font-size="9">Depends on R1</text>
+
+      <!-- R5 node -->
+      <rect x="530" y="115" width="155" height="50" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="607" y="137" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R5: Setup Wizard</text>
+      <text x="607" y="153" text-anchor="middle" fill="#8b949e" font-size="9">R1 + R2 &rarr; 1-day CVW setup</text>
+
+      <!-- R8 node -->
+      <rect x="310" y="183" width="130" height="45" rx="8" fill="rgba(88,166,255,0.12)" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="375" y="205" text-anchor="middle" fill="#58a6ff" font-size="10" font-weight="600">R8: Tag Rename</text>
+      <text x="375" y="219" text-anchor="middle" fill="#8b949e" font-size="9">Depends on R1</text>
+
+      <!-- Batch validation node (dashed) -->
+      <rect x="310" y="248" width="130" height="38" rx="8" fill="rgba(88,166,255,0.06)" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="375" y="271" text-anchor="middle" fill="#8b949e" font-size="9.5">Batch validation &amp; diffing</text>
+
+      <!-- Independent items -->
+      <rect x="530" y="190" width="155" height="42" rx="8" fill="rgba(63,185,80,0.1)" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="607" y="209" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="600">R3, R4, R7</text>
+      <text x="607" y="224" text-anchor="middle" fill="#8b949e" font-size="8.5">No deps &mdash; start anytime</text>
+
+      <!-- Strategic items -->
+      <rect x="530" y="250" width="155" height="45" rx="8" fill="rgba(210,153,34,0.1)" stroke="#d29922" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="607" y="270" text-anchor="middle" fill="#d29922" font-size="10" font-weight="600">R6, R9, R10</text>
+      <text x="607" y="286" text-anchor="middle" fill="#8b949e" font-size="8.5">BLAM/Engine team collab</text>
+    </svg>
   </div>
 
   <h3>Design Principles</h3>
   <ol>
-    <li><strong>Unblock automation first</strong> — R1 must ship before anything else can compound</li>
-    <li><strong>Quick wins for morale</strong> — R3 and R7 give artists visible relief within weeks</li>
-    <li><strong>Layer, don't replace</strong> — Build tooling on top of existing architecture before proposing rewrites</li>
-    <li><strong>Prove value with data</strong> — Track time-per-new-asset before and after R5 ships</li>
-    <li><strong>Strategic items = investigation first</strong> — R6/R9/R10 start as proposals, not implementations</li>
+    <li><strong>Unblock automation first</strong> &mdash; R1 must ship before anything else can compound</li>
+    <li><strong>Quick wins for morale</strong> &mdash; R3 and R7 give artists visible relief within weeks</li>
+    <li><strong>Layer, don't replace</strong> &mdash; Build tooling on top of existing architecture before proposing rewrites</li>
+    <li><strong>Prove value with data</strong> &mdash; Track time-per-new-asset before and after R5 ships</li>
+    <li><strong>Strategic items = investigation first</strong> &mdash; R6/R9/R10 start as proposals, not implementations</li>
   </ol>
 </section>
-
 <!-- 9. Effort & ROI -->
 <section id="effort">
-  <h2>9. Effort Estimates & ROI</h2>
+  <h2>9. Effort Estimates &amp; ROI</h2>
 
-  <h3>Investment Required</h3>
+  <h3>Investment Required &mdash; By Discipline</h3>
   <table>
-    <tr><th>Recommendation</th><th>Person-Months</th><th>Dependencies</th></tr>
-    <tr><td>R1: Python Tag Field API</td><td>2–3</td><td>None</td></tr>
-    <tr><td>R2: Maya→Tag Auto-Fill</td><td>1–2</td><td>R1</td></tr>
-    <tr><td>R3: Collision Export Crash Fix</td><td>&lt;1</td><td>None</td></tr>
-    <tr><td>R4: Auto-Export Before PIE</td><td>1–2</td><td>None</td></tr>
-    <tr><td>R5: UE Derivation Setup Wizard</td><td>2–4</td><td>R1, R2</td></tr>
-    <tr><td>R7: Collision Preview</td><td>1–2</td><td>None</td></tr>
-    <tr><td>R8: Tag Rename Tool</td><td>1–2</td><td>R1</td></tr>
-    <tr><td><strong>Total (Short + Medium Term)</strong></td><td><strong>~9–16</strong></td><td></td></tr>
+    <thead>
+      <tr><th>Recommendation</th><th>Engineers</th><th>Tech Artists</th><th>Artists</th><th>Total PM</th><th>Dependencies</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>R1: Python Tag Field API</td><td>1.5&ndash;2</td><td>0.5&ndash;1</td><td>&mdash;</td><td><strong>2&ndash;3</strong></td><td>None</td></tr>
+      <tr><td>R2: Maya&rarr;Tag Auto-Fill</td><td>&mdash;</td><td>1&ndash;2</td><td>0&ndash;0.5 (UAT)</td><td><strong>1&ndash;2</strong></td><td>R1</td></tr>
+      <tr><td>R3: Collision Export Crash Fix</td><td>0.5&ndash;1</td><td>&mdash;</td><td>&mdash;</td><td><strong>&lt;1</strong></td><td>None</td></tr>
+      <tr><td>R4: Auto-Export Before PIE</td><td>1&ndash;1.5</td><td>0&ndash;0.5</td><td>&mdash;</td><td><strong>1&ndash;2</strong></td><td>None</td></tr>
+      <tr><td>R5: UE Derivation Setup Wizard</td><td>1&ndash;2</td><td>1&ndash;2</td><td>0.5&ndash;1 (UAT)</td><td><strong>2&ndash;4</strong></td><td>R1, R2</td></tr>
+      <tr><td>R7: Collision Preview</td><td>0.5&ndash;1</td><td>0.5&ndash;1</td><td>&mdash;</td><td><strong>1&ndash;2</strong></td><td>None</td></tr>
+      <tr><td>R8: Tag Rename Tool</td><td>0.5&ndash;1</td><td>0.5&ndash;1</td><td>&mdash;</td><td><strong>1&ndash;2</strong></td><td>R1</td></tr>
+      <tr style="background:rgba(88,166,255,0.06);"><td><strong>Total (Short + Medium Term)</strong></td><td><strong>5.5&ndash;9.5</strong></td><td><strong>4&ndash;7.5</strong></td><td><strong>0.5&ndash;1.5</strong></td><td><strong>~9&ndash;16</strong></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Discipline Notes:</strong>
+    <ul style="margin-top:0.5rem;">
+      <li><strong>Engineers</strong> (BLAM/UE) &mdash; Core API development (R1), UE editor integration (R4, R7), crash fixes (R3). Heaviest in short-term phase.</li>
+      <li><strong>Tech Artists</strong> &mdash; Maya scripting (R2), wizard UX design (R5), validation logic, tag field mapping. Primary owners of medium-term deliverables.</li>
+      <li><strong>Artists</strong> &mdash; User acceptance testing for R2 and R5. Minimal direct development work; primary <em>beneficiaries</em> of the tooling.</li>
+    </ul>
+  </div>
+
+  <h3>Strategic Phase (Months 7&ndash;9) &mdash; Additional Investment</h3>
+  <table>
+    <thead>
+      <tr><th>Recommendation</th><th>Engineers</th><th>Tech Artists</th><th>Artists</th><th>Total PM</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>R6: Incremental Structure Gen</td><td>2&ndash;3</td><td>0.5&ndash;1</td><td>&mdash;</td><td><strong>2.5&ndash;4</strong></td><td>BLAM engine team</td></tr>
+      <tr><td>R9: Collision Pipeline Redesign</td><td>2&ndash;4</td><td>1&ndash;2</td><td>0.5 (UAT)</td><td><strong>3.5&ndash;6.5</strong></td><td>Investigation first</td></tr>
+      <tr><td>R10: Reduce Mesh Separation</td><td>1&ndash;2</td><td>0.5&ndash;1</td><td>0.5 (UAT)</td><td><strong>2&ndash;3.5</strong></td><td>Investigation first</td></tr>
+    </tbody>
   </table>
 
   <h3>Time Savings Per New CVW Asset</h3>
   <table>
     <tr><th>Investment</th><th>Current Cost</th><th>Post-Investment Cost</th><th>Savings</th></tr>
-    <tr><td>R2 (Maya auto-fill)</td><td>2–4 days manual wiring</td><td>Minutes</td><td>~2–4 days/asset</td></tr>
-    <tr><td>R5 (Setup wizard)</td><td>1–3 weeks total setup</td><td>&lt;1 day</td><td>~4–14 days/asset</td></tr>
-    <tr><td>R3 (Crash fix)</td><td>Hours of workaround</td><td>0</td><td>~2–4 hrs/iteration</td></tr>
+    <tr><td>R2 (Maya auto-fill)</td><td>2&ndash;4 days manual wiring</td><td>Minutes</td><td>~2&ndash;4 days/asset</td></tr>
+    <tr><td>R5 (Setup wizard)</td><td>1&ndash;3 weeks total setup</td><td>&lt;1 day</td><td>~4&ndash;14 days/asset</td></tr>
+    <tr><td>R3 (Crash fix)</td><td>Hours of workaround</td><td>0</td><td>~2&ndash;4 hrs/iteration</td></tr>
     <tr><td>R4 (Auto-export)</td><td>~5 min/PIE session</td><td>0</td><td>Thousands of minutes</td></tr>
   </table>
 
   <div class="effort-highlight">
-    <h4>Return on Investment — M2 Alone</h4>
-    <p><span class="number">45–55 person-weeks saved</span></p>
-    <p>At 13–16 new CVW asset types × current 1–3 week rate = 13–48 person-weeks of setup. Post-tooling cost: &lt;2 person-weeks total. Net savings: 11–46 person-weeks (conservative: 45–55 PW including iteration improvements).</p>
-    <p style="margin-top: 0.5rem;"><strong>Investment: 9–16 PM (~39–70 PW) → Savings: 45–55 PW in M2 + compounds in M3</strong></p>
-    <p style="font-size: 0.9rem; color: var(--text-muted);">Net positive by end of M2. Further compounds in M3 (additional 6–9K new character assets, 12+ types, more equipment).</p>
+    <h4>Return on Investment &mdash; M2 Alone</h4>
+    <p><span class="number">45&ndash;55 person-weeks saved</span></p>
+    <p>At 13&ndash;16 new CVW asset types &times; current 1&ndash;3 week rate = 13&ndash;48 person-weeks of setup. Post-tooling cost: &lt;2 person-weeks total. Net savings: 11&ndash;46 person-weeks (conservative: 45&ndash;55 PW including iteration improvements).</p>
+    <p style="margin-top: 0.5rem;"><strong>Investment: 9&ndash;16 PM (~39&ndash;70 PW) &rarr; Savings: 45&ndash;55 PW in M2 + compounds in M3</strong></p>
+    <p style="font-size: 0.9rem; color: var(--text-muted);">Net positive by end of M2. Further compounds in M3 (additional 6&ndash;9K new character assets, 12+ types, more equipment).</p>
   </div>
 
   <h3>Beyond the Numbers</h3>
   <p>The ROI calculation above only captures direct setup time. It does <em>not</em> include:</p>
   <ul>
-    <li><strong>Innovation unlocked</strong> — features previously cut due to setup cost become viable</li>
-    <li><strong>Outsource enablement</strong> — documented, automated pipeline can be taught to external partners</li>
-    <li><strong>Error reduction</strong> — automated validation catches wiring bugs before they reach QA</li>
-    <li><strong>Knowledge democratization</strong> — fewer "only 2 people know how to do this" bottlenecks</li>
-    <li><strong>AI-agent acceleration</strong> — Python API makes the pipeline ideal for LLM-assisted authoring</li>
+    <li><strong>Innovation unlocked</strong> &mdash; features previously cut due to setup cost become viable</li>
+    <li><strong>Outsource enablement</strong> &mdash; documented, automated pipeline can be taught to external partners</li>
+    <li><strong>Error reduction</strong> &mdash; automated validation catches wiring bugs before they reach QA</li>
+    <li><strong>Knowledge democratization</strong> &mdash; fewer &ldquo;only 2 people know how to do this&rdquo; bottlenecks</li>
+    <li><strong>AI-agent acceleration</strong> &mdash; Python API makes the pipeline ideal for LLM-assisted authoring</li>
   </ul>
 </section>
-
 <!-- 10. Risks -->
 <section id="risks">
   <h2>10. Risks & Mitigations</h2>
