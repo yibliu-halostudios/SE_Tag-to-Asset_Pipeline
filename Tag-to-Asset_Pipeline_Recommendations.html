@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tag-to-Asset Pipeline — Analysis & Recommendations</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #d29922;
+    --accent4: #f85149;
+    --tier1: #3fb950;
+    --tier2: #58a6ff;
+    --tier3: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #1a1f35 40%, #0d2137 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+  }
+  .hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero .subtitle { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 1rem; }
+  .hero .attribution { font-size: 0.9rem; color: var(--accent); font-style: italic; }
+
+  /* Layout */
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 3rem;
+  }
+  .toc h2 { font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; border: none; padding: 0; }
+  .toc ol { padding-left: 1.2rem; }
+  .toc li { margin-bottom: 0.4rem; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Sections */
+  section { margin-bottom: 3rem; }
+  section[id] { scroll-margin-top: 1rem; }
+  h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 1.2rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.25rem; font-weight: 600; margin: 1.8rem 0 0.8rem; color: var(--accent); }
+  h4 { font-size: 1.05rem; font-weight: 600; margin: 1.2rem 0 0.6rem; }
+  p { margin-bottom: 1rem; }
+  ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.3rem; }
+  strong { color: #fff; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.92rem; }
+  th { background: var(--surface2); color: var(--accent); font-weight: 600; text-align: left; padding: 0.7rem 1rem; border: 1px solid var(--border); }
+  td { padding: 0.6rem 1rem; border: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  /* Code */
+  code { background: var(--surface2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.88em; font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; }
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; overflow-x: auto; margin: 1rem 0 1.5rem; font-size: 0.85rem; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+
+  /* Diagram boxes */
+  .diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; overflow-x: auto; }
+  .diagram pre { border: none; padding: 0; margin: 0; background: transparent; }
+
+  /* Callouts */
+  .callout { border-left: 4px solid var(--accent); background: var(--surface); padding: 1rem 1.2rem; margin: 1rem 0 1.5rem; border-radius: 0 6px 6px 0; }
+  .callout.warning { border-left-color: var(--accent3); }
+  .callout.danger { border-left-color: var(--accent4); }
+  .callout.success { border-left-color: var(--accent2); }
+
+  /* Tier badges */
+  .tier-badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600; margin-right: 0.5rem; }
+  .tier-badge.t1 { background: rgba(63,185,80,0.15); color: var(--tier1); border: 1px solid rgba(63,185,80,0.3); }
+  .tier-badge.t2 { background: rgba(88,166,255,0.15); color: var(--tier2); border: 1px solid rgba(88,166,255,0.3); }
+  .tier-badge.t3 { background: rgba(210,153,34,0.15); color: var(--tier3); border: 1px solid rgba(210,153,34,0.3); }
+
+  /* Tier summary cards */
+  .tier-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem; margin: 1.5rem 0; }
+  .tier-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; position: relative; overflow: hidden; }
+  .tier-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .tier-card.t1::before { background: var(--tier1); }
+  .tier-card.t2::before { background: var(--tier2); }
+  .tier-card.t3::before { background: var(--tier3); }
+  .tier-card h4 { margin-top: 0.3rem; }
+  .tier-card .meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem; }
+  .tier-card ul { font-size: 0.9rem; }
+
+  /* Effort highlight */
+  .effort-highlight { background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1rem 0; }
+  .effort-highlight h4 { color: var(--accent); margin-top: 0; }
+  .effort-highlight .number { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+
+  /* Risk */
+  .risk-high { color: var(--accent4); font-weight: 600; }
+  .risk-medium { color: var(--accent3); font-weight: 600; }
+  .risk-low { color: var(--accent2); font-weight: 600; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.6rem; }
+    .container { padding: 1rem; }
+    .tier-cards { grid-template-columns: 1fr; }
+  }
+
+  /* Print */
+  @media print {
+    body { background: #fff; color: #000; }
+    .hero { background: #f5f5f5; border-bottom-color: #ddd; }
+    .hero h1 { color: #000; }
+    .toc, .tier-card, pre, .diagram, .callout, .effort-highlight { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>Tag-to-Asset Pipeline</h1>
+  <p class="subtitle">Analysis & Recommendations — Project Meteorite</p>
+  <p class="attribution">Prepared by Yibo Liu &nbsp;|&nbsp; AI-assisted research & drafting: Claude Opus 4.6</p>
+</header>
+
+<div class="container">
+
+<!-- Table of Contents -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#executive-summary">Executive Summary</a></li>
+    <li><a href="#architecture">Current Architecture</a></li>
+    <li><a href="#core-problem">The Core Problem</a></li>
+    <li><a href="#scale-challenge">The Asset Scale Challenge</a></li>
+    <li><a href="#pain-points">Confirmed Pain Points</a></li>
+    <li><a href="#root-causes">Root Cause Analysis</a></li>
+    <li><a href="#recommendations">Recommendations</a></li>
+    <li><a href="#roadmap">Implementation Roadmap</a></li>
+    <li><a href="#effort">Effort Estimates & ROI</a></li>
+    <li><a href="#risks">Risks & Mitigations</a></li>
+  </ol>
+</nav>
+
+<!-- 1. Executive Summary -->
+<section id="executive-summary">
+  <h2>1. Executive Summary</h2>
+
+  <div class="callout danger">
+    <strong>Critical Finding:</strong> Every new CVW asset (character, vehicle, or weapon) requires 1–3 weeks of Technical Art time for "UE Derivation" — the manual process of wiring UE content into BLAM tag structures. At M2/M3 scale (3–4× content volume), this represents <strong>6–12 person-months</strong> of pure setup work per milestone, creating an unacceptable bottleneck.
+  </div>
+
+  <p>The Tag-to-Asset Pipeline is the end-to-end data flow connecting Unreal Engine content to the BLAM runtime in Project Meteorite's stitched engine. It encompasses two directions:</p>
+  <ul>
+    <li><strong>Upstream (Blam Tags):</strong> Authoring and editing BLAM tag DataAssets within UE — repetitive, requires specialized knowledge, lacks automation</li>
+    <li><strong>Downstream (UE Derivation):</strong> Converting UE-authored content (meshes, animations, physics) into BLAM binary format — manual, error-prone, 1–3 weeks per new asset</li>
+  </ul>
+
+  <div class="callout success">
+    <strong>Primary Recommendation:</strong> Invest in a <strong>Python Tag Field Read/Write API</strong> (R1). A working prototype already exists. This single capability unlocks automation of the entire UE Derivation setup process, reducing new asset creation from weeks to under one day. Estimated ROI: 7–12 person-months invested → 45–55 person-weeks saved in M2 alone.
+  </div>
+
+  <h3>Key Numbers</h3>
+  <table>
+    <tr><th>Metric</th><th>Value</th></tr>
+    <tr><td>BLAM tags in M1 project</td><td>~34,300</td></tr>
+    <tr><td>CVW assets (Characters + Vehicles + Weapons)</td><td>~18,900</td></tr>
+    <tr><td>UE Derivation setup time per new asset</td><td>1–3 weeks</td></tr>
+    <tr><td>Collision structure generation time</td><td>3–5 minutes per export</td></tr>
+    <tr><td>M2 projected new CVW types</td><td>~13–16 genuinely new types</td></tr>
+    <tr><td>UE Derivation cost at current rate for M2</td><td>6–12 person-months</td></tr>
+    <tr><td>Cost after implementing R1–R5</td><td>&lt;2 person-months</td></tr>
+  </table>
+</section>
+
+<!-- 2. Current Architecture -->
+<section id="architecture">
+  <h2>2. Current Architecture</h2>
+
+  <h3>2.1 Tag Data Asset System</h3>
+  <p>Every BLAM tag type is represented in UE as a subclass of <code>UBlamTagDataAssetBase</code> — a UE DataAsset containing binary BLAM bulk data plus UE metadata. The system defines ~100+ tag types, with the following CVW-relevant types being central:</p>
+
+  <table>
+    <tr><th>Tag Extension</th><th>UE Class</th><th>Role</th></tr>
+    <tr><td><code>.model</code></td><td>UBlamModelTagDataAsset</td><td>Master tag for any dynamic object — owns all sub-tags</td></tr>
+    <tr><td><code>.collision_model</code></td><td>UBlamCollisionModelTagDataAsset</td><td>Physical collision (region/permutation/bone per mesh)</td></tr>
+    <tr><td><code>.skeleton_model</code></td><td>UBlamSkeletonModelTagDataAsset</td><td>Skeleton/rig data</td></tr>
+    <tr><td><code>.physics_model</code></td><td>UBlamPhysicsModelTagDataAsset</td><td>Ragdoll/physics simulation</td></tr>
+    <tr><td><code>.render_model</code></td><td>UBlamRenderModelTagDataAsset</td><td>Visual mesh</td></tr>
+    <tr><td><code>.model_animation_graph</code></td><td>UBlamModelAnimationGraphTagDataAsset</td><td>Animation state machine</td></tr>
+    <tr><td><code>.biped</code></td><td>UBlamBipedTagDataAsset</td><td>Character/AI entity</td></tr>
+    <tr><td><code>.vehicle</code></td><td>UBlamVehicleTagDataAsset</td><td>Vehicle entity</td></tr>
+    <tr><td><code>.weapon</code></td><td>UBlamWeaponTagDataAsset</td><td>Weapon entity</td></tr>
+  </table>
+
+  <h3>2.2 The Model Tag Cluster</h3>
+  <p><code>UBlamModelTagDataAsset</code> is the root of any CVW asset's tag hierarchy. It references:</p>
+  <div class="diagram">
+<pre>
+    ┌─────────────────────────────────┐
+    │   UBlamModelTagDataAsset        │
+    │   (.model)                      │
+    ├─────────────────────────────────┤
+    │ → SkeletonModel (.skeleton)     │──→ UBlamSkeletonModelTagDataAsset
+    │ → CollisionModel (.collision)   │──→ UBlamCollisionModelTagDataAsset
+    │ → PhysicsModel (.physics)       │──→ UBlamPhysicsModelTagDataAsset
+    │ → AnimGraph (.model_anim_graph) │──→ UBlamModelAnimationGraphTagDataAsset
+    │ → RegionStringTable             │──→ Regions, Permutations, Materials
+    └─────────────────────────────────┘
+</pre>
+  </div>
+  <p>Each sub-tag must be manually created, named to match the BLAM path exactly, and wired back to the parent model tag.</p>
+
+  <h3>2.3 Tag-to-Asset Manager (Runtime Resolution)</h3>
+  <p><code>FBlamTagToAssetManager</code> maps BLAM tag indices to UE DataAssets at runtime. It enforces a <strong>strict 1:1 naming convention</strong>:</p>
+  <pre><code>BLAM tag: objects/vehicles/banshee/banshee
+UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</code></pre>
+  <p>This coupling means renaming, moving, or restructuring assets is extremely difficult — both UE and BLAM paths must remain synchronized at all times.</p>
+
+  <h3>2.4 Sidecar XML System (Export Path)</h3>
+  <p>When exporting UE content to BLAM, the system generates a <code>.sidecar.xml</code> file that drives the Foundation/BLAM toolchain:</p>
+  <ul>
+    <li>Contains metadata (asset name, type, output folder)</li>
+    <li>Defines intermediate file locations (FBX exports for models, collision, physics, animations)</li>
+    <li>Follows the Foundation XML schema (same format used by Halo's legacy DAM tools)</li>
+    <li>Generated by <code>FBlamTagSidecarGenerator</code> within the UE editor</li>
+  </ul>
+
+  <h3>2.5 The Two Data Flow Directions</h3>
+  <div class="diagram">
+<pre>
+Direction 1: BLAM → UE ("Tag Loading") — AUTOMATIC
+═══════════════════════════════════════════════════
+  Legacy Reach Binary Tag → BlamTagIoHandler → UBlamTagDataAssetBase → Runtime
+
+Direction 2: UE → BLAM ("UE Derivation") — MANUAL
+═══════════════════════════════════════════════════
+  UE Content → Sidecar XML → FBX Export → Foundation Tool → BLAM Binary → Reload
+  ▲                                                                          │
+  └──────────── 1–3 WEEKS of manual setup per new asset ─────────────────────┘
+</pre>
+  </div>
+</section>
+
+<!-- 3. The Core Problem -->
+<section id="core-problem">
+  <h2>3. The Core Problem</h2>
+
+  <h3>The Manual Duplication Bottleneck</h3>
+  <p>The fundamental problem is that artists must <strong>manually duplicate structural data that already exists</strong> in their DCC tool (Maya) into BLAM tag fields — one field at a time, through the UE tag editor, with no automation possible.</p>
+
+  <div class="callout danger">
+    <p><em>"We already have to localize collision and render meshes under joints in maya... Tooling to help support 'scraping' the data from maya to auto-fill these out would save both time and human error."</em></p>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">— Senior TA, ST-9548</p>
+  </div>
+
+  <p>Specifically, for each collision model the artist must manually set:</p>
+  <ul>
+    <li><strong>Region</strong> — which region of the model this collision mesh belongs to</li>
+    <li><strong>Material</strong> — the collision material assignment</li>
+    <li><strong>Permutation</strong> — which permutation (variant) this applies to</li>
+    <li><strong>Bone</strong> — which skeleton bone this collision mesh is bound to</li>
+    <li><strong>CollisionMesh</strong> — reference to the UE StaticMesh asset</li>
+  </ul>
+  <p>All of this data <em>already exists in the Maya scene hierarchy</em> — joints define bones, naming defines regions/permutations, and meshes are already parented. But there is no bridge to propagate it into BLAM tags.</p>
+
+  <h3>Why Automation Doesn't Exist Today</h3>
+  <div class="callout warning">
+    <p><em>"Due to not being able to access the actual tag <strong>fields</strong> via python, you can't hook them together in any automatic way."</em></p>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">— Senior TA, ST-9548</p>
+  </div>
+
+  <p>The Python scripting environment in UE <strong>cannot read or write individual tag field values</strong>. It can call high-level operations (create tag, trigger export), but cannot programmatically set the region, bone, or permutation fields that constitute the bulk of manual work.</p>
+
+  <p><code>BlamDerivedTagToAssetMapper</code> — a class that previously provided some auto-mapping capability — was <strong>deleted</strong> in changelist 340820. Its removal left manual wiring as the only path.</p>
+
+  <h3>The Innovation Tax</h3>
+  <div class="callout">
+    <p><em>"This is a laborious process that limits innovation because the already steep cost here was one of many reasons that we would often say <strong>any new or innovative feature to be added to an asset would need to be cut.</strong>"</em></p>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">— Ben Frazier (Creative Lead), ST-9446</p>
+  </div>
+  <p>The high setup cost doesn't just slow production — it actively prevents creative teams from adding features to assets. New destruction states, interaction modes, or variant systems all multiply the number of tags that must be hand-wired.</p>
+</section>
+
+<!-- 4. Scale Challenge -->
+<section id="scale-challenge">
+  <h2>4. The Asset Scale Challenge</h2>
+
+  <h3>4.1 M1 Content Footprint</h3>
+  <table>
+    <tr><th>Content Area</th><th>M1 Asset Count</th><th>M1 Disk</th></tr>
+    <tr><td>Characters</td><td>~13,600</td><td>~11 GB</td></tr>
+    <tr><td>Vehicles</td><td>~3,700</td><td>~8 GB</td></tr>
+    <tr><td>Weapons</td><td>~1,600</td><td>~5 GB</td></tr>
+    <tr><td>Tags (BLAM total)</td><td><strong>~34,300</strong></td><td>~5 GB</td></tr>
+    <tr><td>Environments</td><td>~31,300</td><td>~40 GB</td></tr>
+    <tr><td>VFX</td><td>~10,000</td><td>~5%</td></tr>
+    <tr><td>Animations</td><td>~11,000 clips</td><td>—</td></tr>
+    <tr><td><strong>Total Package</strong></td><td>—</td><td><strong>86 GB</strong> (40% over target)</td></tr>
+  </table>
+
+  <h3>4.2 Historical Content Multipliers (Halo CE → 2 → 3)</h3>
+  <p>Using the original trilogy as a proxy for scope growth:</p>
+  <table>
+    <tr><th>Content Type</th><th>Halo: CE</th><th>Halo 2</th><th>Halo 3</th><th>CE→2 Growth</th></tr>
+    <tr><td>Playable Characters</td><td>1</td><td>2 (+ Arbiter)</td><td>2</td><td>+100%</td></tr>
+    <tr><td>Enemy Types</td><td>~8</td><td>~13</td><td>~16</td><td>+60%</td></tr>
+    <tr><td>Usable Weapons</td><td>10</td><td>~15 (+ dual-wield)</td><td>~16 (+ 9 equipment)</td><td>+50%</td></tr>
+    <tr><td>Vehicles</td><td>~6</td><td>~9 (+ hijacking)</td><td>~12</td><td>+50%</td></tr>
+    <tr><td>Multiplayer Maps</td><td>0 (campaign only)</td><td>12+ competitive</td><td>11+ competitive</td><td>N/A → 12+</td></tr>
+  </table>
+
+  <h3>4.3 Projected M2/M3 New CVW Assets</h3>
+  <table>
+    <tr><th>Category</th><th>M1</th><th>M2 Projected</th><th>New Types Needing UE Derivation</th></tr>
+    <tr><td>Weapons</td><td>10 types (~1,600 assets)</td><td>~15 types (+ dual-wield)</td><td>~5 new weapon types</td></tr>
+    <tr><td>Vehicles</td><td>~6 types (~3,700 assets)</td><td>~9 types (+ hijacking)</td><td>~3 new vehicle types</td></tr>
+    <tr><td>Characters/Enemies</td><td>Current roster</td><td>+ Brutes, Drones, Arbiter, Prophets</td><td>~5–8 new types</td></tr>
+    <tr><td>Device Machines</td><td>Deliberately limited</td><td>Significantly more needed</td><td>Dozens</td></tr>
+    <tr><td>MP Maps</td><td>0</td><td>12+ competitive maps</td><td>Each needs full collision/nav</td></tr>
+  </table>
+
+  <div class="effort-highlight">
+    <h4>Cost at Current Rate</h4>
+    <p><span class="number">6–12 person-months</span></p>
+    <p>Conservative estimate for M2 UE Derivation setup work alone (13–16 new CVW types × 1–3 weeks each). This does not include iteration time, bug fixing, or the crash/workaround overhead.</p>
+  </div>
+
+  <h3>4.4 What Breaks at Scale</h3>
+  <ol>
+    <li><strong>TA Bottleneck:</strong> Only Technical Artists can do UE Derivation (requires specialized BLAM knowledge). Team size is fixed.</li>
+    <li><strong>Innovation Tax:</strong> Every new feature on an asset multiplies setup cost → features get cut.</li>
+    <li><strong>Error Compounding:</strong> Manual wiring × more assets = more bugs. Each collision mis-wire takes hours to diagnose.</li>
+    <li><strong>No Outsource Path:</strong> Cannot outsource UE Derivation (no documentation, requires deep BLAM knowledge).</li>
+    <li><strong>Collision Pipeline:</strong> Each MP map needs full collision/navmesh work at 3–5 min per export with frequent crashes.</li>
+  </ol>
+</section>
+
+<!-- 5. Pain Points -->
+<section id="pain-points">
+  <h2>5. Confirmed Pain Points</h2>
+
+  <table>
+    <tr><th>ID</th><th>Pain Point</th><th>Severity</th><th>Source</th></tr>
+    <tr><td>P0</td><td><strong>UE Derivation setup = 1–3 weeks per new CVW asset</strong></td><td class="risk-high">Critical</td><td>ST-9446 (Ben Frazier)</td></tr>
+    <tr><td>P1</td><td>BLAM structure generation = 3–5 min per collision export</td><td class="risk-high">High</td><td>Confluence: Collision page</td></tr>
+    <tr><td>P2</td><td>No Python access to tag field data — blocks all automation</td><td class="risk-high">Critical</td><td>ST-9548</td></tr>
+    <tr><td>P3</td><td>Crash on collision export with asset loaded in level (100% repro)</td><td class="risk-medium">High</td><td>ST-9548</td></tr>
+    <tr><td>P4</td><td>Socket/marker round-trip broken in UE 5.5</td><td class="risk-medium">Medium</td><td>ST-9548</td></tr>
+    <tr><td>P5</td><td>Must re-export to BLAM before every PIE session</td><td class="risk-medium">Medium</td><td>PIE+Blam Confluence page</td></tr>
+    <tr><td>P6</td><td>Naming constraints — no capitalization-only renames, strict 1:1 coupling</td><td class="risk-medium">Medium</td><td>Codebase + Confluence</td></tr>
+    <tr><td>P7</td><td>Separate meshes for Render/Collision/Fallback/HLOD bloats asset count</td><td class="risk-medium">Medium</td><td>Worlds Post-Mortem</td></tr>
+    <tr><td>P8</td><td>Duplicate manual work — Maya data cannot be scraped into tags</td><td class="risk-high">Critical</td><td>ST-9548</td></tr>
+    <tr><td>P9</td><td>Collision authoring "needs to go back to the drawing board"</td><td class="risk-high">High</td><td>Worlds Post-Mortem</td></tr>
+  </table>
+</section>
+
+<!-- 6. Root Cause Analysis -->
+<section id="root-causes">
+  <h2>6. Root Cause Analysis</h2>
+
+  <h3>6.1 Categorization</h3>
+  <table>
+    <tr><th>Pain Point</th><th>Root Cause Category</th><th>BLAM-Fundamental?</th><th>Fixable via Tooling?</th></tr>
+    <tr><td>P0: 1–3 week setup</td><td>No automation — manual Maya→BLAM data duplication</td><td>Partially</td><td><strong>YES</strong></td></tr>
+    <tr><td>P1: 3–5 min structure gen</td><td>BLAM structure generator performance</td><td>Yes</td><td>Partially</td></tr>
+    <tr><td>P2: No Python tag fields</td><td>Missing API layer</td><td>No</td><td><strong>YES</strong></td></tr>
+    <tr><td>P3: Export crash</td><td>Concurrency bug in BLAM/UE integration</td><td>No</td><td><strong>YES</strong></td></tr>
+    <tr><td>P4: Socket round-trip</td><td>UE 5.5 regression</td><td>No</td><td>YES</td></tr>
+    <tr><td>P5: Must re-export for PIE</td><td>Architecture: BLAM reads from disk, not UE memory</td><td>Yes</td><td>Partially</td></tr>
+    <tr><td>P6: Naming constraints</td><td>Strict 1:1 path coupling</td><td>Yes</td><td>Partially</td></tr>
+    <tr><td>P7: Mesh bloat</td><td>BLAM requires distinct mesh per purpose</td><td>Yes</td><td>No</td></tr>
+    <tr><td>P8: Duplicate Maya work</td><td>No data bridge DCC→BLAM</td><td>No</td><td><strong>YES</strong></td></tr>
+    <tr><td>P9: Collision redesign</td><td>Multiple: slow gen, crash, manual wiring</td><td>Partially</td><td>YES</td></tr>
+  </table>
+
+  <h3>6.2 The 80/20 Finding</h3>
+  <div class="callout success">
+    <strong>4 of 9 pain points trace to a single root cause: lack of Python read/write access to tag field data.</strong>
+    <p style="margin-top: 0.5rem;">Fixing this one capability gap addresses P0 (setup time), P2 (no automation), P8 (duplicate work), and partially P6 (rename tooling). It is the single highest-leverage investment identified in this study.</p>
+  </div>
+
+  <h3>6.3 Summary by Category</h3>
+  <table>
+    <tr><th>Category</th><th>Count</th><th>Fixable?</th></tr>
+    <tr><td>Tooling/automation gap (Python, Maya bridge, rename tools)</td><td>4 (P0, P2, P8, P6)</td><td class="risk-low">YES — highest ROI</td></tr>
+    <tr><td>BLAM-fundamental (structure gen, separate meshes, disk-based)</td><td>3 (P1, P5, P7)</td><td class="risk-medium">Partially — workarounds</td></tr>
+    <tr><td>Engineering bugs (crash, socket, concurrency)</td><td>2 (P3, P4)</td><td class="risk-low">YES — discrete fixes</td></tr>
+    <tr><td>Needs architectural change (collision redesign)</td><td>1 (P9)</td><td class="risk-medium">Requires multi-team effort</td></tr>
+  </table>
+</section>
+
+<!-- 7. Recommendations -->
+<section id="recommendations">
+  <h2>7. Recommendations</h2>
+
+  <p>Ten recommendations organized into three tiers aligned with the TA Strategy Roadmap themes:</p>
+  <ul>
+    <li><strong>Theme 1 — Scale Through Productivity:</strong> Increase throughput without growing team</li>
+    <li><strong>Theme 2 — Minimize BLAM Surface Area:</strong> Reduce UE↔BLAM coupling where possible</li>
+    <li><strong>Theme 3 — Build the Foundation:</strong> Infrastructure for M2, M3, and beyond</li>
+  </ul>
+
+  <!-- R1 -->
+  <h3>R1: Python Tag Field Read/Write API</h3>
+  <p><span class="tier-badge t1">Short-Term</span> <span class="tier-badge t1">PRIMARY</span></p>
+
+  <div class="callout success">
+    <strong>This is the single most important recommendation.</strong> A working prototype already exists. Completing and shipping this API unlocks the majority of automation potential across the pipeline.
+  </div>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P0, P2, P8 (and enables R2, R5, R8)</td></tr>
+    <tr><td>Effort</td><td>2–3 person-months</td></tr>
+    <tr><td>Impact</td><td><strong>Critical</strong> — prerequisite for all automation</td></tr>
+    <tr><td>Risk</td><td class="risk-low">Low — prototype exists</td></tr>
+    <tr><td>AI-Agent Opportunity</td><td>HIGH — structured data transformations are ideal for coding agents</td></tr>
+  </table>
+
+  <p><strong>What it enables:</strong></p>
+  <ul>
+    <li>Automated UE Derivation setup (minutes instead of weeks)</li>
+    <li>Maya scene data scraping → auto-populate tag fields</li>
+    <li>Batch validation (catch wiring errors before export)</li>
+    <li>Tag diff tooling (meaningful change tracking between versions)</li>
+    <li>Scripted rename/refactoring operations</li>
+  </ul>
+
+  <!-- R2 -->
+  <h3>R2: Maya→Tag Auto-Fill Script</h3>
+  <p><span class="tier-badge t1">Short-Term</span> Depends on R1</p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P8 — duplicate work between Maya and BLAM tags</td></tr>
+    <tr><td>Effort</td><td>1–2 person-months (once R1 ships)</td></tr>
+    <tr><td>Impact</td><td>High — automates the most tedious part of Step 4 (manual wiring)</td></tr>
+    <tr><td>Risk</td><td class="risk-low">Low — Maya Python API well-understood</td></tr>
+  </table>
+  <p>Reads Maya scene structure (joints, meshes, naming conventions) and auto-populates collision model entries: Region, Material, Permutation, Bone, and Mesh references. Validates naming conventions before proceeding.</p>
+
+  <!-- R3 -->
+  <h3>R3: Fix Collision Export Crash</h3>
+  <p><span class="tier-badge t1">Short-Term</span> Quick Win</p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P3 — 100% repro crash when asset is loaded in level during export</td></tr>
+    <tr><td>Effort</td><td>&lt;1 person-month</td></tr>
+    <tr><td>Impact</td><td>High — eliminates constant workflow interruption</td></tr>
+    <tr><td>Risk</td><td class="risk-low">Low — discrete, reproducible bug</td></tr>
+  </table>
+  <p>Either fix the underlying concurrent access bug, or auto-unload the asset before export and reload after (transparent workaround).</p>
+
+  <!-- R4 -->
+  <h3>R4: Auto-Export Before PIE</h3>
+  <p><span class="tier-badge t2">Medium-Term</span></p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P5 — must manually re-export to BLAM before every PIE session</td></tr>
+    <tr><td>Effort</td><td>1–2 person-months</td></tr>
+    <tr><td>Impact</td><td>Medium — eliminates constant "did I remember to export?" confusion</td></tr>
+    <tr><td>Risk</td><td class="risk-medium">Medium — must handle export failures gracefully</td></tr>
+  </table>
+  <p>Detect dirty tags (UE source data newer than BLAM binary), auto-trigger export on PIE launch, show progress. Skip if tags are up-to-date.</p>
+
+  <!-- R5 -->
+  <h3>R5: UE Derivation Setup Wizard</h3>
+  <p><span class="tier-badge t2">Medium-Term</span> Depends on R1 + R2</p>
+
+  <div class="callout">
+    <strong>Target outcome:</strong> Reduce initial CVW asset setup from 1–3 weeks to <strong>less than one day</strong> for standard asset archetypes.
+  </div>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P0 — the 1–3 week initial setup bottleneck</td></tr>
+    <tr><td>Effort</td><td>2–4 person-months</td></tr>
+    <tr><td>Impact</td><td><strong>Critical</strong> — directly addresses the scaling bottleneck</td></tr>
+    <tr><td>Risk</td><td class="risk-medium">Medium — must handle diverse asset archetypes</td></tr>
+  </table>
+  <p>A guided step-by-step workflow in the UE editor that:</p>
+  <ul>
+    <li>Auto-creates all required sub-tags with correct naming</li>
+    <li>Auto-wires references between model → sub-tags</li>
+    <li>Integrates Maya auto-fill (R2) as a step</li>
+    <li>Pre-validates naming, folder structure, and required fields</li>
+    <li>Generates sidecar XML automatically</li>
+  </ul>
+
+  <!-- R6 -->
+  <h3>R6: Incremental Structure Generation</h3>
+  <p><span class="tier-badge t3">Strategic</span> Requires BLAM Team Collaboration</p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P1 — 3–5 minutes per collision export</td></tr>
+    <tr><td>Effort</td><td>High (BLAM team engagement required)</td></tr>
+    <tr><td>Impact</td><td>High — iteration speed × number of iterations = massive savings</td></tr>
+    <tr><td>Risk</td><td class="risk-high">High — BLAM structure generator is not TA-owned</td></tr>
+  </table>
+  <p>Only regenerate structures for changed regions/permutations. Cache previous results. Detect "no change" to skip entirely.</p>
+
+  <!-- R7 -->
+  <h3>R7: Collision Preview in UE (No Export Required)</h3>
+  <p><span class="tier-badge t2">Medium-Term</span></p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P9 (partially) — slow collision feedback loop</td></tr>
+    <tr><td>Effort</td><td>Medium (UE-side only, no engine changes needed)</td></tr>
+    <tr><td>Impact</td><td>High — instant feedback without 3–5 min export cycle</td></tr>
+    <tr><td>Risk</td><td class="risk-medium">Medium — rendering fidelity vs. actual BLAM collision</td></tr>
+  </table>
+  <p>Render collision mesh outlines in UE viewport without requiring BLAM export. Show triangle count vs. budget in real-time. Already identified in the TA Strategy Roadmap as a Phase 1 quick win.</p>
+
+  <!-- R8 -->
+  <h3>R8: Tag Rename/Refactoring Tool</h3>
+  <p><span class="tier-badge t2">Medium-Term</span> Depends on R1</p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P6 — naming constraints and blocked renames</td></tr>
+    <tr><td>Effort</td><td>1–2 person-months</td></tr>
+    <tr><td>Impact</td><td>Medium — eliminates a rare-but-painful blocker</td></tr>
+    <tr><td>Risk</td><td class="risk-low">Low — pattern is well-established</td></tr>
+  </table>
+  <p>Safely rename a tag across all references (UE paths, BLAM paths, scene references). Update both sides atomically. Validate no orphaned references.</p>
+
+  <!-- R9 -->
+  <h3>R9: Collision Pipeline Redesign</h3>
+  <p><span class="tier-badge t3">Strategic</span></p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P1, P3, P7, P9 — the entire collision sub-pipeline</td></tr>
+    <tr><td>Effort</td><td>Very High (multi-team, multi-quarter)</td></tr>
+    <tr><td>Impact</td><td><strong>Critical</strong> — fundamental improvement to most-painful sub-pipeline</td></tr>
+    <tr><td>Risk</td><td class="risk-high">Very High — requires engine-team collaboration</td></tr>
+  </table>
+  <p>Investigation areas: Can collision be authored in UE and only exported at cook time? Can the separate mesh requirement be eliminated? Can BLAM structure generation be replaced with a UE-native equivalent? Start as investigation in M2 pre-production.</p>
+
+  <!-- R10 -->
+  <h3>R10: Reduce Mesh Separation Overhead</h3>
+  <p><span class="tier-badge t3">Strategic</span></p>
+
+  <table>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+    <tr><td>Solves</td><td>P7 — separate meshes for Render/Collision/Fallback/HLOD bloats count</td></tr>
+    <tr><td>Effort</td><td>High (touches BLAM architecture assumptions)</td></tr>
+    <tr><td>Impact</td><td>Medium — reduces proliferation at scale</td></tr>
+    <tr><td>Risk</td><td class="risk-high">High — deeply coupled to BLAM runtime expectations</td></tr>
+  </table>
+  <p>Investigate whether a single source mesh with automated derivation (LOD/collision/fallback) can replace the current many-mesh-per-asset pattern. Explore during R9 collision redesign work.</p>
+</section>
+
+<!-- 8. Roadmap -->
+<section id="roadmap">
+  <h2>8. Implementation Roadmap</h2>
+
+  <div class="diagram">
+<pre>
+SHORT-TERM (M2 Pre-Production, Months 1–3)
+═══════════════════════════════════════════
+  ┌──────────────────────────────────────────────────┐
+  │  R1: Python Tag Field API  ◄── UNLOCKS ALL ELSE  │
+  │  R3: Fix Collision Export Crash (quick win)       │
+  │  R7: Collision Preview in UE (partial)            │
+  └──────────────────────────────────────────────────┘
+  Outcome: Remove worst crash, enable automation prototyping,
+           instant collision feedback for artists
+
+MEDIUM-TERM (M2 Early Production, Months 4–6)
+═════════════════════════════════════════════
+  ┌──────────────────────────────────────────────────┐
+  │  R2: Maya→Tag Auto-Fill (depends on R1)           │
+  │  R4: Auto-Export Before PIE                       │
+  │  R5: UE Derivation Setup Wizard (R1 + R2)        │
+  │  R8: Tag Rename Tool (depends on R1)              │
+  └──────────────────────────────────────────────────┘
+  Outcome: New CVW asset setup drops from 1–3 weeks to &lt; 1 day
+           Iteration cycle improves across the board
+
+STRATEGIC (M2 Mid-Production → M3, Months 7–12+)
+═════════════════════════════════════════════════
+  ┌──────────────────────────────────────────────────┐
+  │  R6: Incremental Structure Generation (BLAM team) │
+  │  R9: Collision Pipeline Redesign (investigation)  │
+  │  R10: Reduce Mesh Separation (investigation)      │
+  └──────────────────────────────────────────────────┘
+  Outcome: Fundamental architecture improvements for M3+
+           Prepare pipeline for next-gen evolution
+</pre>
+  </div>
+
+  <h3>Dependency Graph</h3>
+  <div class="diagram">
+<pre>
+  R1 (Python API) ─────┬──→ R2 (Maya Auto-Fill) ──→ R5 (Setup Wizard)
+                        ├──→ R8 (Rename Tool)
+                        └──→ Batch validation, tag diffing
+
+  R3 (Crash Fix) ──→ Independent (no dependencies)
+  R4 (Auto-Export) ──→ Independent (no dependencies)
+  R7 (Collision Preview) ──→ Independent (no dependencies)
+
+  R6, R9, R10 ──→ Require BLAM/Engine team collaboration
+</pre>
+  </div>
+
+  <h3>Design Principles</h3>
+  <ol>
+    <li><strong>Unblock automation first</strong> — R1 must ship before anything else can compound</li>
+    <li><strong>Quick wins for morale</strong> — R3 and R7 give artists visible relief within weeks</li>
+    <li><strong>Layer, don't replace</strong> — Build tooling on top of existing architecture before proposing rewrites</li>
+    <li><strong>Prove value with data</strong> — Track time-per-new-asset before and after R5 ships</li>
+    <li><strong>Strategic items = investigation first</strong> — R6/R9/R10 start as proposals, not implementations</li>
+  </ol>
+</section>
+
+<!-- 9. Effort & ROI -->
+<section id="effort">
+  <h2>9. Effort Estimates & ROI</h2>
+
+  <h3>Investment Required</h3>
+  <table>
+    <tr><th>Recommendation</th><th>Person-Months</th><th>Dependencies</th></tr>
+    <tr><td>R1: Python Tag Field API</td><td>2–3</td><td>None</td></tr>
+    <tr><td>R2: Maya→Tag Auto-Fill</td><td>1–2</td><td>R1</td></tr>
+    <tr><td>R3: Collision Export Crash Fix</td><td>&lt;1</td><td>None</td></tr>
+    <tr><td>R4: Auto-Export Before PIE</td><td>1–2</td><td>None</td></tr>
+    <tr><td>R5: UE Derivation Setup Wizard</td><td>2–4</td><td>R1, R2</td></tr>
+    <tr><td>R7: Collision Preview</td><td>1–2</td><td>None</td></tr>
+    <tr><td>R8: Tag Rename Tool</td><td>1–2</td><td>R1</td></tr>
+    <tr><td><strong>Total (Short + Medium Term)</strong></td><td><strong>~9–16</strong></td><td></td></tr>
+  </table>
+
+  <h3>Time Savings Per New CVW Asset</h3>
+  <table>
+    <tr><th>Investment</th><th>Current Cost</th><th>Post-Investment Cost</th><th>Savings</th></tr>
+    <tr><td>R2 (Maya auto-fill)</td><td>2–4 days manual wiring</td><td>Minutes</td><td>~2–4 days/asset</td></tr>
+    <tr><td>R5 (Setup wizard)</td><td>1–3 weeks total setup</td><td>&lt;1 day</td><td>~4–14 days/asset</td></tr>
+    <tr><td>R3 (Crash fix)</td><td>Hours of workaround</td><td>0</td><td>~2–4 hrs/iteration</td></tr>
+    <tr><td>R4 (Auto-export)</td><td>~5 min/PIE session</td><td>0</td><td>Thousands of minutes</td></tr>
+  </table>
+
+  <div class="effort-highlight">
+    <h4>Return on Investment — M2 Alone</h4>
+    <p><span class="number">45–55 person-weeks saved</span></p>
+    <p>At 13–16 new CVW asset types × current 1–3 week rate = 13–48 person-weeks of setup. Post-tooling cost: &lt;2 person-weeks total. Net savings: 11–46 person-weeks (conservative: 45–55 PW including iteration improvements).</p>
+    <p style="margin-top: 0.5rem;"><strong>Investment: 9–16 PM (~39–70 PW) → Savings: 45–55 PW in M2 + compounds in M3</strong></p>
+    <p style="font-size: 0.9rem; color: var(--text-muted);">Net positive by end of M2. Further compounds in M3 (additional 6–9K new character assets, 12+ types, more equipment).</p>
+  </div>
+
+  <h3>Beyond the Numbers</h3>
+  <p>The ROI calculation above only captures direct setup time. It does <em>not</em> include:</p>
+  <ul>
+    <li><strong>Innovation unlocked</strong> — features previously cut due to setup cost become viable</li>
+    <li><strong>Outsource enablement</strong> — documented, automated pipeline can be taught to external partners</li>
+    <li><strong>Error reduction</strong> — automated validation catches wiring bugs before they reach QA</li>
+    <li><strong>Knowledge democratization</strong> — fewer "only 2 people know how to do this" bottlenecks</li>
+    <li><strong>AI-agent acceleration</strong> — Python API makes the pipeline ideal for LLM-assisted authoring</li>
+  </ul>
+</section>
+
+<!-- 10. Risks -->
+<section id="risks">
+  <h2>10. Risks & Mitigations</h2>
+
+  <table>
+    <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr>
+    <tr>
+      <td>Python API stability across UE upgrades (5.5 → 5.7)</td>
+      <td class="risk-medium">Medium</td>
+      <td class="risk-medium">Medium</td>
+      <td>Design API as thin wrapper over tag binary access. Version the API. Test on UE 5.7 eval branch early.</td>
+    </tr>
+    <tr>
+      <td>R5 wizard cannot handle all asset archetypes</td>
+      <td class="risk-medium">Medium</td>
+      <td class="risk-medium">Medium</td>
+      <td>Start with the 3 most common archetypes (biped, vehicle, weapon). Add archetypes incrementally. Allow manual override for edge cases.</td>
+    </tr>
+    <tr>
+      <td>Collision pipeline redesign (R9) requires engine-level changes</td>
+      <td class="risk-high">High</td>
+      <td class="risk-high">High</td>
+      <td>Start with UE-side preview only (no engine changes). Engage engine team for deeper changes only after quick wins prove value. Budget 2–3 months for investigation before committing.</td>
+    </tr>
+    <tr>
+      <td>BLAM structure generator performance (R6) is not TA-fixable</td>
+      <td class="risk-high">High</td>
+      <td class="risk-medium">Medium</td>
+      <td>Focus on "skip when unchanged" (zero-cost check). Request incremental mode from BLAM team with clear ROI data.</td>
+    </tr>
+    <tr>
+      <td>M2 pre-production starts before R1 ships</td>
+      <td class="risk-medium">Medium</td>
+      <td class="risk-high">High</td>
+      <td>R1 prototype already exists — accelerate. R3 (crash fix) and R7 (preview) are independent and deliver value immediately.</td>
+    </tr>
+    <tr>
+      <td>Team knowledge loss during M1→M2 transition</td>
+      <td class="risk-high">High</td>
+      <td class="risk-medium">Medium</td>
+      <td>Document UE Derivation workflow NOW while M1 practitioners are available. R5 wizard encodes institutional knowledge in code rather than people's heads.</td>
+    </tr>
+  </table>
+
+  <h3>What We Are NOT Recommending</h3>
+  <ul>
+    <li><strong>Replacing the stitched engine</strong> — Leadership has committed to BLAM for M2/M3. We optimize within this constraint.</li>
+    <li><strong>Rewriting the Tag system from scratch</strong> — Too risky, too slow. Layer automation on top.</li>
+    <li><strong>Blocking M2 production for pipeline perfection</strong> — Short-term wins (R1, R3, R7) deliver value in weeks. Production can start in parallel.</li>
+    <li><strong>Over-investing in collision redesign without proof</strong> — R9 starts as investigation. Commit only when quick wins (R7 preview) prove the approach.</li>
+  </ul>
+</section>
+
+</div><!-- end container -->
+</body>
+</html>
