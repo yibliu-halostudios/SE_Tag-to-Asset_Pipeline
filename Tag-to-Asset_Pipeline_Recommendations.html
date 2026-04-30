@@ -519,19 +519,6 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
     <li>Generates sidecar XML automatically</li>
   </ul>
 
-  <!-- R6 -->
-  <h3>R6: Incremental Structure Generation</h3>
-  <p><span class="tier-badge t3">Strategic</span> Requires BLAM Team Collaboration</p>
-
-  <table>
-    <tr><th>Attribute</th><th>Detail</th></tr>
-    <tr><td>Solves</td><td>P1 — 3–5 minutes per collision export</td></tr>
-    <tr><td>Effort</td><td>High (BLAM team engagement required)</td></tr>
-    <tr><td>Impact</td><td>High — iteration speed × number of iterations = massive savings</td></tr>
-    <tr><td>Risk</td><td class="risk-high">High — BLAM structure generator is not TA-owned</td></tr>
-  </table>
-  <p>Only regenerate structures for changed regions/permutations. Cache previous results. Detect "no change" to skip entirely.</p>
-
   <!-- R7 -->
   <h3>R7: Collision Preview in UE (No Export Required)</h3>
   <p><span class="tier-badge t2">Medium-Term</span></p>
@@ -558,31 +545,9 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
   </table>
   <p>Safely rename a tag across all references (UE paths, BLAM paths, scene references). Update both sides atomically. Validate no orphaned references.</p>
 
-  <!-- R9 -->
-  <h3>R9: Collision Pipeline Redesign</h3>
-  <p><span class="tier-badge t3">Strategic</span></p>
-
-  <table>
-    <tr><th>Attribute</th><th>Detail</th></tr>
-    <tr><td>Solves</td><td>P1, P3, P7, P9 — the entire collision sub-pipeline</td></tr>
-    <tr><td>Effort</td><td>Very High (multi-team, multi-quarter)</td></tr>
-    <tr><td>Impact</td><td><strong>Critical</strong> — fundamental improvement to most-painful sub-pipeline</td></tr>
-    <tr><td>Risk</td><td class="risk-high">Very High — requires engine-team collaboration</td></tr>
-  </table>
-  <p>Investigation areas: Can collision be authored in UE and only exported at cook time? Can the separate mesh requirement be eliminated? Can BLAM structure generation be replaced with a UE-native equivalent? Start as investigation in M2 pre-production.</p>
-
-  <!-- R10 -->
-  <h3>R10: Reduce Mesh Separation Overhead</h3>
-  <p><span class="tier-badge t3">Strategic</span></p>
-
-  <table>
-    <tr><th>Attribute</th><th>Detail</th></tr>
-    <tr><td>Solves</td><td>P7 — separate meshes for Render/Collision/Fallback/HLOD bloats count</td></tr>
-    <tr><td>Effort</td><td>High (touches BLAM architecture assumptions)</td></tr>
-    <tr><td>Impact</td><td>Medium — reduces proliferation at scale</td></tr>
-    <tr><td>Risk</td><td class="risk-high">High — deeply coupled to BLAM runtime expectations</td></tr>
-  </table>
-  <p>Investigate whether a single source mesh with automated derivation (LOD/collision/fallback) can replace the current many-mesh-per-asset pattern. Explore during R9 collision redesign work.</p>
+  <div class="callout" style="margin-top:2rem;">
+    <strong>Collision &amp; Nav Mesh:</strong> Deeper collision pipeline recommendations (incremental structure generation, collision pipeline redesign, mesh separation) are covered in the dedicated <em>Collision &amp; Navigation Mesh Workflow</em> study.
+  </div>
 
   <!-- Cross-Validation Additions (GPT 5.4) -->
   <h3 style="margin-top:2.5rem; padding-top:1.5rem; border-top:1px solid var(--border);">Cross-Validation Additions</h3>
@@ -732,15 +697,6 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
           </div>
         </div>
       </div>
-      <!-- Parallel: R6/R9/R10 investigation -->
-      <div style="display:flex; align-items:center; height:34px; margin-bottom:3px;">
-        <div style="width:160px; flex-shrink:0; font-size:0.82rem; font-weight:600; padding-right:1rem; text-align:right; white-space:nowrap;">R6/R9/R10: Investigation</div>
-        <div style="flex:1; position:relative; height:26px;">
-          <div style="position:absolute; left:40%; width:60%; height:26px; background:rgba(210,153,34,0.4); border-radius:4px; border:1px dashed var(--tier3); display:flex; align-items:center; padding:0 8px;">
-            <span style="font-size:0.72rem; font-weight:600; color:#fff;">BLAM team &mdash; proposals only</span>
-          </div>
-        </div>
-      </div>
       <!-- Gate markers -->
       <div style="display:flex; margin-top:0.8rem; padding-left:160px;">
         <div style="flex:2; text-align:right; padding-right:8px;">
@@ -763,12 +719,11 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
     <tr><td>R2 and R8 run simultaneously after R1</td><td>Both depend on R1 but not each other; different disciplines (TA vs eng)</td><td class="risk-low">Low</td></tr>
     <tr><td>R5 begins while R2 is at ~80%</td><td>Wizard scaffolding doesn't need R2 complete; only final integration does</td><td class="risk-medium">Medium</td></tr>
     <tr><td>R3/R4/R7 start Day 1 alongside R1</td><td>Zero dependency on R1 &mdash; separate engineers can own these</td><td class="risk-low">Low</td></tr>
-    <tr><td>R6/R9/R10 as investigation only</td><td>Strategic items produce proposals during months 3&ndash;5, no implementation commitment</td><td class="risk-low">Low</td></tr>
   </table>
 <!-- Visual Dependency Graph (SVG) -->
   <h3>Dependency Graph</h3>
   <div style="overflow-x:auto; margin:1.5rem 0;">
-    <svg viewBox="0 0 720 290" style="width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 720 210" style="width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#58a6ff"/>
@@ -811,11 +766,6 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       <rect x="530" y="155" width="155" height="42" rx="8" fill="rgba(63,185,80,0.1)" stroke="#3fb950" stroke-width="1.5"/>
       <text x="607" y="174" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="600">R3, R4, R7</text>
       <text x="607" y="189" text-anchor="middle" fill="#8b949e" font-size="8.5">No deps &mdash; start anytime</text>
-
-      <!-- Strategic items -->
-      <rect x="530" y="215" width="155" height="45" rx="8" fill="rgba(210,153,34,0.1)" stroke="#d29922" stroke-width="1.5" stroke-dasharray="5,3"/>
-      <text x="607" y="235" text-anchor="middle" fill="#d29922" font-size="10" font-weight="600">R6, R9, R10</text>
-      <text x="607" y="251" text-anchor="middle" fill="#8b949e" font-size="8.5">BLAM/Engine team collab</text>
     </svg>
   </div>
 
@@ -825,7 +775,6 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
     <li><strong>Maximize parallelism</strong> &mdash; Independent items (R3, R4, R7) start Day 1 on separate tracks</li>
     <li><strong>Overlap where safe</strong> &mdash; R5 scaffolding begins before R2 finalizes</li>
     <li><strong>Quick wins for morale</strong> &mdash; R3 and R7 deliver visible relief within weeks</li>
-    <li><strong>Strategic items = investigation only</strong> &mdash; R6/R9/R10 produce proposals, not implementations</li>
   </ol>
 </section>
 <!-- 9. Effort & ROI -->
@@ -857,18 +806,6 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       <li><strong>Artists</strong> &mdash; User acceptance testing for R2 and R5. Minimal direct development work; primary <em>beneficiaries</em> of the tooling.</li>
     </ul>
   </div>
-
-  <h3>Strategic Phase (Months 7&ndash;9) &mdash; Additional Investment</h3>
-  <table>
-    <thead>
-      <tr><th>Recommendation</th><th>Engineers</th><th>Tech Artists</th><th>Artists</th><th>Total PM</th><th>Notes</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>R6: Incremental Structure Gen</td><td>2&ndash;3</td><td>0.5&ndash;1</td><td>&mdash;</td><td><strong>2.5&ndash;4</strong></td><td>BLAM engine team</td></tr>
-      <tr><td>R9: Collision Pipeline Redesign</td><td>2&ndash;4</td><td>1&ndash;2</td><td>0.5 (UAT)</td><td><strong>3.5&ndash;6.5</strong></td><td>Investigation first</td></tr>
-      <tr><td>R10: Reduce Mesh Separation</td><td>1&ndash;2</td><td>0.5&ndash;1</td><td>0.5 (UAT)</td><td><strong>2&ndash;3.5</strong></td><td>Investigation first</td></tr>
-    </tbody>
-  </table>
 
   <h3>Time Savings Per New CVW Asset</h3>
   <table>
@@ -909,18 +846,6 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
       <td>Start with the 3 most common archetypes (biped, vehicle, weapon). Add archetypes incrementally. Allow manual override for edge cases.</td>
     </tr>
     <tr>
-      <td>Collision pipeline redesign (R9) requires engine-level changes</td>
-      <td class="risk-high">High</td>
-      <td class="risk-high">High</td>
-      <td>Start with UE-side preview only (no engine changes). Engage engine team for deeper changes only after quick wins prove value. Budget 2–3 months for investigation before committing.</td>
-    </tr>
-    <tr>
-      <td>BLAM structure generator performance (R6) is not TA-fixable</td>
-      <td class="risk-high">High</td>
-      <td class="risk-medium">Medium</td>
-      <td>Focus on "skip when unchanged" (zero-cost check). Request incremental mode from BLAM team with clear ROI data.</td>
-    </tr>
-    <tr>
       <td>M2 pre-production starts before R1 ships</td>
       <td class="risk-medium">Medium</td>
       <td class="risk-high">High</td>
@@ -939,7 +864,6 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
     <li><strong>Replacing the stitched engine</strong> — Leadership has committed to BLAM for M2/M3. We optimize within this constraint.</li>
     <li><strong>Rewriting the Tag system from scratch</strong> — Too risky, too slow. Layer automation on top.</li>
     <li><strong>Blocking M2 production for pipeline perfection</strong> — Short-term wins (R1, R3, R7) deliver value in weeks. Production can start in parallel.</li>
-    <li><strong>Over-investing in collision redesign without proof</strong> — R9 starts as investigation. Commit only when quick wins (R7 preview) prove the approach.</li>
   </ul>
 </section>
 
