@@ -487,3 +487,240 @@ BLAM tags: **~34,300 assets** (includes scenario structures, BSP data, BLAM meta
 **Source:** Worlds Post-Mortem  
 - *"Currently stitched collision workflows are very slow, opaque, and error prone. I suggest we go back to the drawing board on how to author, view, and generate collision"*  
 - *"We need a way to instantly update collision meshes when reimporting, without having to export to Blam"*
+
+---
+
+## Phase 3: Recommendations
+
+### Strategic Framework
+All recommendations are framed within the three themes from the TA Strategy Roadmap:
+1. **Scale Through Productivity** — Increase throughput without proportionally increasing team
+2. **Minimize BLAM Surface Area** — Reduce the coupling between UE and BLAM where possible
+3. **Build the Foundation** — Invest in infrastructure that sustains velocity across M2, M3, and beyond
+
+### Priority Matrix
+
+| ID | Recommendation | Theme | Effort | Impact | Timeline |
+|----|---------------|-------|--------|--------|----------|
+| R1 | Python Tag Field API | 1, 3 | Medium | **Critical** | Short-term |
+| R2 | Maya→Tag Auto-Fill Script | 1 | Low (once R1 ships) | High | Short-term |
+| R3 | Fix Collision Export Crash (P3) | 1 | Low | High | Short-term |
+| R4 | Auto-Export Before PIE | 1, 2 | Medium | Medium | Short-term |
+| R5 | UE Derivation Setup Wizard | 1, 3 | Medium | **Critical** | Medium-term |
+| R6 | Incremental Structure Generation | 1, 2 | High (BLAM team) | High | Medium-term |
+| R7 | Collision Preview in UE (No Export) | 1, 2 | High | High | Medium-term |
+| R8 | Tag Rename/Refactoring Tool | 1, 3 | Medium | Medium | Medium-term |
+| R9 | Collision Pipeline Redesign | 2, 3 | Very High | **Critical** | Strategic |
+| R10 | Reduce Mesh Separation Overhead | 2 | High (architecture) | Medium | Strategic |
+
+---
+
+### R1: Python Tag Field Read/Write API (PRIMARY RECOMMENDATION)
+
+**Problem it solves:** P0, P2, P8 — the single root cause behind most pipeline pain  
+**Evidence:** Prototype already exists and is promising (confirmed by Yibo)  
+**What it enables:**
+- Automated UE Derivation setup (minutes instead of weeks)
+- Maya data scraping → auto-fill tag parameters
+- Batch validation (catch wiring errors before export)
+- Tag diff tooling (meaningful change tracking)
+- Foundation for R2, R5, R8
+
+**Implementation approach:**
+- Expose BLAM tag binary field read/write via Python bindings (likely UE Python scripting / Blueprint-callable)
+- Need to handle: field addressing, block arrays, tag references, enum values
+- Target: read/write any field on any `UBlamTagDataAssetBase` subclass from Python
+
+**Risk:** Low — prototype exists. Main risk is API stability across UE upgrades.  
+**AI-agent opportunity:** HIGH — structured data transformations are ideal for coding agents (noted in TA Strategy Roadmap)
+
+---
+
+### R2: Maya→Tag Auto-Fill Script
+
+**Problem it solves:** P8 — duplicate work between Maya and BLAM tags  
+**Prerequisite:** R1 (Python tag field API)  
+**What it does:**
+- Reads Maya scene structure (joints, meshes, naming conventions)
+- Auto-populates collision model entries: Region, Material, Permutation, Bone, Mesh references
+- Auto-populates physics model bodies
+- Validates naming conventions before export
+
+**Impact:** Turns the most tedious part of Step 4 (manual wiring) from hours → seconds  
+**Risk:** Low once R1 is available. Maya Python API is well-understood.
+
+---
+
+### R3: Fix Collision Export Crash (P3)
+
+**Problem it solves:** P3 — 100% repro crash when exporting collision with asset loaded in level  
+**What it does:**
+- Engineering investigation into the concurrent access bug
+- Either: fix the underlying race condition, OR
+- Auto-unload the asset before export and reload after (user-facing workaround)
+
+**Impact:** Eliminates a workflow interruption that occurs on nearly every collision iteration  
+**Risk:** Low — this is a discrete, reproducible bug with clear scope
+
+---
+
+### R4: Auto-Export Before PIE
+
+**Problem it solves:** P5 — must manually re-export to BLAM before every PIE session  
+**What it does:**
+- Detect dirty tags (tags whose UE source data is newer than their BLAM binary)
+- Automatically trigger export of dirty tags when PIE is launched
+- Show progress notification; skip if all tags are up-to-date
+
+**Impact:** Eliminates a constant "did I remember to export?" source of confusion  
+**Risk:** Medium — need to handle: export failures blocking PIE, performance (don't export 100 tags), user override  
+**Theme 2 alignment:** Reduces the visible surface area of BLAM to the artist ("it just works")
+
+---
+
+### R5: UE Derivation Setup Wizard
+
+**Problem it solves:** P0 — the 1–3 week initial setup  
+**Prerequisite:** R1 (Python tag field API)  
+**What it does:**
+- Guided step-by-step workflow in UE editor for setting up a new CVW asset
+- Auto-creates all required sub-tags with correct naming
+- Auto-wires references between model → sub-tags
+- Pre-validates naming, folder structure, and required fields
+- Integrates Maya auto-fill (R2) as a step
+- Generates sidecar XML automatically
+
+**Target:** Reduce initial setup from 1–3 weeks to **< 1 day** for standard asset archetypes  
+**Risk:** Medium — needs to handle diverse asset archetypes (biped, vehicle, weapon each differ)  
+**AI-agent opportunity:** A wizard driven by Python + templates is ideal for AI-assisted asset setup
+
+---
+
+### R6: Incremental Structure Generation
+
+**Problem it solves:** P1 — 3–5 minutes per collision export  
+**What it does:**
+- Only regenerate BLAM structures for changed regions/permutations
+- Cache previous structure generation results
+- Detect which meshes actually changed since last export
+
+**Impact:** Could reduce iteration from 3–5 min to seconds for localized changes  
+**Risk:** HIGH — requires BLAM team cooperation. The structure generator is not owned by TA.  
+**Mitigation:** Start with "detect no change → skip" (zero-cost check before invoking generator)
+
+---
+
+### R7: Collision Preview in UE (No Export Required)
+
+**Problem it solves:** P9 (partially) — slow feedback loop for collision authoring  
+**What it does:**
+- Render collision mesh outlines in UE viewport without requiring BLAM export
+- Show triangle count vs. budget in real-time
+- Highlight regions/permutations visually
+
+**Impact:** Artists get instant feedback on collision without the 3–5 min export cycle  
+**Risk:** Medium — UE-side only, no engine changes needed (per TA Strategy Roadmap: "Start with UE-side preview")  
+**Note:** Already identified in TA Strategy Roadmap as a Phase 1 quick win for the collision workstream
+
+---
+
+### R8: Tag Rename/Refactoring Tool
+
+**Problem it solves:** P6 — naming constraints and blocked renames  
+**Prerequisite:** R1 (Python tag field API)  
+**What it does:**
+- Safely rename a tag across all references (UE paths, BLAM paths, scene references)
+- Handle the 1:1 coupling constraint by updating both sides atomically
+- Validate no orphaned references after rename
+
+**Impact:** Eliminates a rare-but-painful workflow blocker  
+**Risk:** Low once R1 is available. Pattern is well-established (UE has asset rename tools already).
+
+---
+
+### R9: Collision Pipeline Redesign (Strategic)
+
+**Problem it solves:** P1, P3, P7, P9 — the entire collision sub-pipeline  
+**What it does (conceptually):**
+- Move collision authoring closer to UE-native (reduce BLAM dependency)
+- Explore: can collision be authored in UE and only exported to BLAM at cook time?
+- Explore: can the separate mesh requirement be eliminated with a unified mesh approach?
+- Explore: can BLAM structure generation be replaced with a UE-native equivalent?
+
+**Impact:** Fundamental improvement to the most-painful sub-pipeline  
+**Risk:** VERY HIGH — requires deep collaboration with BLAM/engine team  
+**Timeline:** This is a strategic bet, not a near-term deliverable. Start investigation in M2 pre-production.  
+**Reference:** TA Strategy Roadmap identifies this: *"Collision pipeline overhaul requires engine-level changes — start with UE-side preview, engage engine team for deeper changes"*
+
+---
+
+### R10: Reduce Mesh Separation Overhead (Strategic)
+
+**Problem it solves:** P7 — separate meshes for Render/Collision/Fallback/HLOD bloats count  
+**What it does:**
+- Investigate whether BLAM's requirement for distinct mesh types per purpose can be abstracted
+- Potentially: single source mesh with automated LOD/collision/fallback derivation
+- Potentially: share geometry between roles where topology allows
+
+**Impact:** Reduces asset count proliferation (important at M2/M3 scale)  
+**Risk:** High — touches BLAM architecture assumptions  
+**Timeline:** Strategic. Investigate during R9 work.
+
+---
+
+### Implementation Roadmap
+
+```
+SHORT-TERM (M2 Pre-Production, Months 1–3)
+════════════════════════════════════════════
+  R1: Python Tag Field API ◄── UNLOCK everything else
+  R3: Fix Collision Export Crash
+  R7: Collision Preview in UE (partial — outline rendering)
+  
+  Outcome: Remove worst crash, enable automation prototyping,
+           give artists instant collision feedback
+
+MEDIUM-TERM (M2 Early Production, Months 4–6)
+══════════════════════════════════════════════
+  R2: Maya→Tag Auto-Fill (depends on R1)
+  R4: Auto-Export Before PIE
+  R5: UE Derivation Setup Wizard (depends on R1, R2)
+  R8: Tag Rename Tool (depends on R1)
+  
+  Outcome: New CVW asset setup drops from 1–3 weeks to < 1 day
+           Iteration cycle improves across the board
+
+STRATEGIC (M2 Mid-Production → M3, Months 7–12+)
+═════════════════════════════════════════════════
+  R6: Incremental Structure Generation (BLAM team collab)
+  R9: Collision Pipeline Redesign (investigation → proposal)
+  R10: Reduce Mesh Separation (investigation → proposal)
+  
+  Outcome: Fundamental architecture improvements for M3+
+           Prepare for next-gen pipeline evolution
+```
+
+### Cost-Benefit Summary
+
+| Investment | Person-Months (Est.) | Time Saved Per New CVW Asset | M2 Total Savings |
+|-----------|---------------------|------------------------------|-----------------|
+| R1 (Python API) | 2–3 | Enables all below | Prerequisite |
+| R2 (Maya auto-fill) | 1–2 | 2–4 days → minutes | ~10 person-weeks |
+| R5 (Setup wizard) | 2–4 | 1–3 weeks → <1 day | ~30–40 person-weeks |
+| R3 (Crash fix) | <1 | Hours of workaround → 0 | ~5 person-weeks |
+| R4 (Auto-export PIE) | 1–2 | ~5 min/session → 0 | Thousands of minutes |
+| **Total investment** | **~7–12 PM** | | **~45–55 person-weeks saved in M2** |
+
+**ROI:** 7–12 person-months invested → 45–55 person-weeks (11–14 PM) saved in M2 alone.  
+Net positive within one milestone. Compounds further in M3.
+
+---
+
+## Assumptions & Open Items (to verify with Yibo)
+
+1. **Assumption:** Foundation tool is invoked transparently from UE editor when artist clicks "Import" (evidence: sidecar XML generated in WITH_EDITOR code block, import arguments defined on tag class)
+2. **Assumption:** The Python tag field prototype is being developed in-house by TA team (not external)
+3. **Open:** Exact nature of "pytags" tooling (referenced in TA Strategy Roadmap)
+4. **Open:** CVW Mural post-mortem content (link provided but not extracted yet)
+5. **Open:** Exact count of UE-derived CVW assets vs. total (Yibo said 50+ but doesn't know exact count)
+6. **Open:** Whether the 500K triangle collision limit is a BLAM-fundamental constraint or configurable
