@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -21,12 +21,15 @@
     --tier3: #d29922;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { overflow-x: hidden; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
     line-height: 1.7;
     padding: 0;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 
   /* Hero */
@@ -41,7 +44,7 @@
   .hero .attribution { font-size: 0.9rem; color: var(--accent); font-style: italic; }
 
   /* Layout */
-  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; overflow-x: hidden; }
 
   /* TOC */
   .toc {
@@ -258,7 +261,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
   </ul>
 
   <h3>2.5 The Two Data Flow Directions</h3>
-  <div style="margin:1.5rem 0;">
+  <div style="overflow-x:auto; margin:1.5rem 0;">
     <svg width="900" height="220" viewBox="0 0 900 220" style="max-width:100%; height:auto;" xmlns="http://www.w3.org/2000/svg">
       <!-- Direction 1: Automatic -->
       <rect x="10" y="10" width="880" height="70" rx="8" fill="rgba(63,185,80,0.06)" stroke="#3fb950" stroke-width="1.5"/>
@@ -591,7 +594,7 @@ UE path:  /Game/Tags/objects/vehicles/banshee/banshee-vehicle.banshee-vehicle</c
   <div class="callout success">
     <strong>Approach:</strong> Compress from 9 to 5 months by parallelizing independent work and overlapping R2/R5. Requires <strong>~3 engineers + 3 tech artists + 0.5 artist (UAT)</strong> vs. 2+2 sequential. Contingency: month 6 for R5 edge-case archetypes.
   </div>
-  <div style="margin:1.5rem 0;">
+  <div style="margin:1.5rem 0; overflow:hidden;">
     <div>
       <!-- Month headers -->
       <div style="display:flex; margin-bottom:0.5rem; padding-left:200px;">
