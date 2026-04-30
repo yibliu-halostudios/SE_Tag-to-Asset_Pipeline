@@ -35,7 +35,175 @@
 
 ## Scope Clarifications
 
-*(To be filled as interview progresses)*
+- **Unified study**: Blam Tags (upstream) + UE Derivation (downstream) = one end-to-end pipeline
+- **CVW = Characters, Vehicles, Weapons** — the primary consumers of this pipeline
+- **Both new-from-scratch AND legacy Reach updates** are in scope for M2/M3
+- **Pain is front-loaded**: initial UE Derivation setup = 1–3 weeks; iteration on derived assets is fast
+- **Python tag field access prototype exists** — confirmed achievable and promising
+- **Team also open to architectural refactoring** if capacity allows
+
+---
+
+## Phase 2: Deep Analysis
+
+### 2A. Full End-to-End Workflow Map
+
+#### The Two Directions of Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│  DIRECTION 1: BLAM → UE ("Tag Loading")                                            │
+│  ──────────────────────────────────────                                              │
+│  Legacy Reach tag binary → BlamTagIoHandler → UBlamTagDataAssetBase (UE DataAsset)  │
+│  • Automatic, no artist intervention                                                │
+│  • UAssets in /Game/Tags/ with strict 1:1 naming to BLAM tag path                   │
+│  • Lazy-loaded at runtime via FBlamTagToAssetManager                                │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│  DIRECTION 2: UE → BLAM ("UE Derivation")                                          │
+│  ──────────────────────────────────────────                                          │
+│  UE Content → Sidecar XML → FBX Export → Foundation Tool → BLAM Binary → Reload    │
+│  • MANUAL setup per new asset (1–3 weeks)                                           │
+│  • Fast iteration once initially configured                                          │
+│  • This is where the M2/M3 scaling bottleneck lives                                 │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### UE Derivation: Step-by-Step Workflow (New CVW Asset)
+
+```
+PHASE A — INITIAL SETUP (the 1–3 week bottleneck)
+══════════════════════════════════════════════════
+Step 1: Maya/DCC Authoring
+  • Artist creates SkeletalMesh, collision meshes, physics asset, animations
+  • Must conform to naming conventions (all snake_case)
+  • Must manually zero skeleton orientation
+  • Must set up regions/permutations/bones in Maya rig
+
+Step 2: FBX Export from Maya → UE Import
+  • Must use legacy importer (not Interchange)
+  • Import Blam markers into skeleton FIRST
+  • Collision: either re-author or pull from Reach (requires 3DS Max / Cyprus share)
+
+Step 3: Create Tag UAssets in UE
+  • Create UBlamModelTagDataAsset (.model) in /Game/Tags/...
+  • Create sub-tags: collision_model, skeleton_model, physics_model, model_animation_graph
+  • Each must follow exact naming convention matching BLAM tag path
+  • NO Python automation available — all manual via UE editor
+  • NO auto-mapping (BlamDerivedTagToAssetMapper was DELETED)
+
+Step 4: Wire Up References
+  • Model tag → point to SkeletonModel, CollisionModel, PhysicsModel, AnimGraph sub-tags
+  • CollisionModel → wire each FBlamCollisionMeshData entry:
+    - Region (manual), Material (manual), Permutation (manual), Bone (manual), CollisionMesh (ref)
+  • PhysicsModel → wire physics bodies to bones
+  • All data already exists in Maya rig but CANNOT be auto-scraped (no Python tag field access)
+  ⚠️ THIS IS THE CORE BOTTLENECK: duplicating Maya structure into BLAM tags by hand
+
+Step 5: Configure Sidecar XML & Export
+  • Model tag generates sidecar.xml (via FBlamTagSidecarGenerator)
+  • Sidecar describes folder structure + intermediate FBX paths
+  • UE exports FBXs into intermediate folder
+  • Foundation/BLAM tool picks up sidecar + FBXs → generates BLAM binary structure
+  • Structure generation: 3–5 minutes for collision
+  • 500K triangle limit — crashes if exceeded
+
+Step 6: Blueprint & Game Integration
+  • Create UE Blueprint for the object
+  • Wire Blueprint to tag DataAssets
+  • Configure gameplay parameters (player interaction, destruction, etc.)
+  • Test in PIE (requires re-export to BLAM before every PIE session)
+
+PHASE B — ITERATION (fast once setup is complete)
+══════════════════════════════════════════════════
+  • Edit mesh/anim in Maya → re-export FBX → reimport in UE
+  • Hit "Import" on model tag → regenerates BLAM binary (3–5 min for collision)
+  • Test in PIE
+  • ⚠️ Cannot have asset loaded in level during collision export (100% crash)
+  • ⚠️ Must manually rebuild NavMesh after collision changes
+```
+
+#### Critical Failure Modes in the Pipeline
+
+| Step | Failure Mode | Impact | Frequency |
+|------|-------------|--------|-----------|
+| 3 | Tag naming doesn't match BLAM path | Asset silently fails to load | Occasional |
+| 4 | Region/Permutation/Bone mis-wired | Collision doesn't work in game | Common |
+| 5 | Exceeds 500K triangle budget | Structure generator crashes | Occasional |
+| 5 | Asset loaded in level during export | Editor crash (100% repro) | Very common |
+| 6 | Forgot to re-export before PIE | PIE uses stale data, confusing results | Every session |
+| 4 | Cannot undo naming mistake | Capitalization-only rename blocked by UE | Rare but painful |
+
+---
+
+### 2B. Scale Impact Analysis
+
+#### M1 Baseline
+- ~34,300 BLAM tags total in the project
+- CVW: ~18,900 assets (chars ~13.6K, vehicles ~3.7K, weapons ~1.6K)
+- All important CVW assets (~50+) went through full UE Derivation for M1 ship
+- Each new asset: 1–3 weeks of TA time for initial setup
+- Package size: 86 GB (already 40% over 50 GB target)
+
+#### M2 Projection (Halo CE → Halo 2 scaling)
+| Content | M1 | M2 Projected | New Assets Needing UE Derivation |
+|---------|-----|-------------|----------------------------------|
+| Weapons | ~10 types | ~15 types (+ dual-wield) | ~5 new weapon types |
+| Vehicles | ~6 types | ~9 types (+ hijacking) | ~3 new vehicle types |
+| Characters | Current roster | + Brutes, Drones, Arbiter, Prophets | ~5–8 new enemy/character types |
+| Device Machines | Deliberately limited | Significantly more needed | Dozens |
+| MP Maps | 0 (campaign only) | 12+ competitive maps | Each with unique collision/nav |
+
+#### Cost Projection at Current Rate
+- New CVW assets for M2: **~13–16 genuinely new types** (weapons + vehicles + characters)
+- At **1–3 weeks** UE Derivation setup per type: **13–48 person-weeks** just for initial setup
+- Device machines (related pipeline): dozens more
+- Plus: each MP map requires full collision/nav/HLOD/streaming pipeline work
+- **Conservative estimate: 6–12 person-months of pure UE Derivation setup work for M2 alone**
+- This does NOT include iteration time, bug fixing, or the crash/workaround overhead
+
+#### What Breaks at M2/M3 Scale
+1. **TA bottleneck**: Only TAs can do UE Derivation (specialized BLAM knowledge required). Team size is fixed.
+2. **Innovation tax**: Every new feature on an asset adds setup time. This causes features to be cut.
+3. **Error compounding**: Manual wiring × more assets = more bugs. Each collision mis-wire takes hours to diagnose.
+4. **No outsource path**: Cannot outsource UE Derivation (requires deep BLAM knowledge, no documentation).
+5. **Collision pipeline**: Each MP map needs full collision/navmesh. At 3–5 min per export with frequent crashes, this doesn't scale.
+
+---
+
+### 2C. Root Cause Analysis
+
+| Pain Point | Root Cause Category | BLAM-Fundamental? | Fixable via Tooling? |
+|-----------|--------------------|--------------------|---------------------|
+| P0: 1–3 week setup | **No automation** — manual duplication of Maya data into BLAM tags | Partially (BLAM binary format is fixed) | **YES** — Python tag field access would automate most of this |
+| P1: 3–5 min structure gen | **BLAM structure generator** performance | YES — BLAM tool, not ours | Partially (incremental builds could help) |
+| P2: No Python tag fields | **Missing API layer** between Python and BLAM tag binary | No — this is a tooling gap | **YES** — prototype exists |
+| P3: Crash on export w/ asset loaded | **Engine concurrency bug** | BLAM/UE integration bug | YES — engineering fix |
+| P4: Socket round-trip broken | **UE 5.5 regression** | No — UE bug | YES — UE upgrade or workaround |
+| P5: Must re-export before PIE | **Architecture** — BLAM reads from disk, not UE memory | YES — by design | Partially (could auto-export on PIE) |
+| P6: Naming constraints | **Strict 1:1 coupling** between UE path and BLAM tag path | YES — by design | Partially (rename tooling) |
+| P7: Separate mesh bloat | **BLAM requires** distinct meshes per purpose | YES — BLAM architecture | No (without BLAM changes) |
+| P8: Duplicate Maya→tag data | **No data bridge** between DCC and BLAM | No — tooling gap | **YES** — Maya scraping → auto-fill |
+| P9: Collision redesign needed | **Multiple factors**: slow gen, crash, manual wiring | Partially BLAM | YES (preview, incremental) |
+
+#### Root Cause Categorization Summary
+
+| Category | Count | Fixable? |
+|----------|-------|----------|
+| **Tooling/automation gap** (Python, Maya bridge, rename tools) | 4 (P0, P2, P8, P6) | YES — highest ROI |
+| **BLAM-fundamental** (structure gen, separate meshes, disk-based) | 3 (P1, P5, P7) | Partially — workarounds possible |
+| **Engineering bugs** (crash, socket, concurrency) | 2 (P3, P4) | YES — discrete fixes |
+| **Needs architectural change** (collision redesign) | 1 (P9) | Requires multi-team effort |
+
+#### The "80/20" Finding
+**4 of 9 pain points trace to the same root cause: lack of Python read/write access to tag field data.** Fixing this single capability gap would:
+- Enable automated UE Derivation setup (P0 → minutes instead of weeks)
+- Unlock Maya data scraping into tags (P8 → no more duplicate manual work)
+- Enable batch validation and tag diffing (P2 → catch wiring errors early)
+- Enable scripted rename/refactoring tools (P6 → safe tag renaming)
+
+**This is the single highest-leverage investment identified in this study.**
 
 ---
 
